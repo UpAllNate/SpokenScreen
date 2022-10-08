@@ -6,7 +6,7 @@ except:
 def clearColorScanPixels(colors : list[ColorScanInstance] | ColorScanInstance) -> list[ColorScanInstance] | ColorScanInstance:
     
     # Initialize all pixel return values
-    if isinstance(c, ColorScanInstance):
+    if isinstance(colors, ColorScanInstance):
         colors.startPixel = None
         colors.endPixel = None
     else:

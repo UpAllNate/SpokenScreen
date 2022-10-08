@@ -7,7 +7,7 @@ try:
     from common.ss_ColorClasses import ColorScanInstance, ColorPure
 except:
     from ss_ColorClasses import ColorScanInstance, ColorPure
-    
+
 try:
     from common.ss_ColorMethods import clearColorScanPixels, colorWithinTolerance
 except:
@@ -75,12 +75,15 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
 
         # If this pixel doesn't match the current scan color...
         elif colors[cIndex].startPixel is not None:
+            logSS.debug(f"Pixel {px} color: {pxColor} doesn't match current: {colors[cIndex]}")
 
             # Check if there is a next color
             if cIndex != len(colors) - 1:
+                logSS.debug(f"Index {cIndex} is not the last color")
 
                 # Check if the next color matches the current  pixel
                 if colorWithinTolerance(color=pxColor, target=colors[cIndex + 1].color, tolerance=colors[cIndex + 1].tolerance):
+                    logSS.debug(f"Pixel {px} color: {pxColor} matches next color: {colors[cIndex+1]}")
 
                     # If so, increment to the next color and set
                     # the start pixel
@@ -90,16 +93,18 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
                 
                 # If the next color doesn't match the current pixel...
                 else:
+                    logSS.debug(f"Pixel {px} color: {pxColor} doesn't match next color: {colors[cIndex+1]}")
 
                     # Check if this is a "pure" required color
                     if colors[cIndex].pure == ColorPure.required:
+                        logSS.debug(f"Currently considered color {colors[cIndex]} is pure, must reset sequence")
 
                         # If so, reset the entire sequence
                         colors = clearColorScanPixels(colors)
                         cIndex = 0
                     
                     # Break regardless
-                    break
+                    continue
             
             # If this is the last color in the sequence, end if it's
             # a pure required color
@@ -113,9 +118,13 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
     # If the entire pixel set is scanned and the sequence
     # is not completed, return false
 
-    colors = clearColorScanPixels(colors)
-
-    if singleColorInstance:
-        return False, colors[0]
+    if colors[-1].pure == ColorPure.notRequired and colors[-1].endPixel is not None:
+        if singleColorInstance:
+            return True, colors[0]
+        else:
+            return True, colors
     else:
-        return False, colors
+        if singleColorInstance:
+            return False, colors[0]
+        else:
+            return False, colors    

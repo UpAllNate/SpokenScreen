@@ -11,3 +11,6 @@ class ColorScanInstance:
         self.tolerance = tolerance
         self.startPixel = 0
         self.endPixel = 0
+    
+    def __str__(self) -> str:
+        return f"Color: ({self.color[0]},{self.color[1]},{self.color[2]}), startPixel: {self.startPixel}, endPixel: {self.endPixel}"
