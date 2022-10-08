@@ -16,3 +16,5 @@ Green to Blue (one pixel): 17, 169, 154
 Blue: 0, 162, 232
 Blue to White (one pixel): 127, 208, 243
 White: 255, 255, 255
+
+TODO: Implement Implement loading of screenshot to 2D pixel array / numpy pixel list: https://stackoverflow.com/questions/60293637/read-image-pixels-row-by-row
