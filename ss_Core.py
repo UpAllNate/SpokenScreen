@@ -61,5 +61,5 @@ if __name__ == "__main__":
 
     while True:
         # Screenshot is a PIL Image class PNG of (r,g,b,alpha)
-        screenShot_Whole_Raw = ImageGrab.grab()
-        screenShot_Whole_npArray = numpy.array(screenShot_Whole_Raw).tolist()
+        screenShot_Whole_Image = ImageGrab.grab()
+        screenShot_Whole_npArray = numpy.array(screenShot_Whole_Image).tolist()
