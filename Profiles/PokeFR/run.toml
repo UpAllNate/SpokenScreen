@@ -1,0 +1,92 @@
+
+# Dark blue
+[Colors.Outer_V]
+color       = { r = 72, g = 112, b = 160 }
+tolerance   = 0
+pureReq     = true
+
+# Light blue
+[Colors.Inner_V]
+color       = { r = 160, g = 208, b = 224 }
+tolerance   = 0
+pureReq     = true
+
+# Light blue (same as Inner_V)
+[Colors.Outer_H]
+color       = { r = 160, g = 208, b = 224 }
+tolerance   = 0
+pureReq     = true
+
+# Sort of grey color from the curve aliasing
+[Colors.Inner_H]
+color       = { r = 208, g = 224, b = 240 }
+tolerance   = 0
+pureReq     = true
+
+[Colors.Body]
+color       = { r = 248, g = 248, b = 248 }
+tolerance   = 0
+pureReq     = false # Purity not required because of certainty of finding text pixels
+
+[sequence]
+
+[sequence.tbBlue]
+
+# Get virtical pixel column in the middle of the screen
+[sequence.tbBlue.1]
+function = "getPixelColumn_Percent"
+arguments.image.type = "core"
+arguments.image.value = "screenShot_Whole_npArray"
+arguments.percent.type = "const"
+arguments.percent.value = 0.5
+arguments.limitLowPercent = 0.5
+arguments.limitHighPercent = 1.0
+continue.type = true
+
+[sequence.tbBlue.2]
+function = "pixelSequenceScan"
+arguments.pixels.type = "run element"
+arguments.pixels.value = "sequence.tbBlue.1.result"
+arguements.colors = ["Outer_V", "Inner_V", "Body", "Inner_V", "Outer_V"]
+continue.type = "run element"
+continue.value = ["sequence.tbBlue.2.result",0]
+
+[sequence.tbBlue.3]
+function = "getPixelRow_Pixel"
+arguments.image.type = "core"
+arguments.image.value = "screenShot_Whole_npArray"
+arguments.row.type = "run element"
+
+# start pixel of Body color
+# result contains (resultBool (success or failure), list[ColorScanInstance)]
+# result[1] points to the list[ColorScanInstance)]
+# result[1][2] points to the third ColorScanInstance (body)
+# result[1][2].startPixel points to the first pixel for detecting the textbox body
+arguments.row.value = ["sequence.tbBlue.2.result",1,2,"startPixel"]
+arguments.limitLowPercent = 0.0
+arguments.limitHighPercent = 1.0
+continue.type = true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
