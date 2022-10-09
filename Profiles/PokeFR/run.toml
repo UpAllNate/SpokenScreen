@@ -76,6 +76,21 @@ continue.type = "run element"
 continue.value = ["sequence.tbBlue.4.result",0]
 
 [sequence.tbBlue.5]
+function = "arithmetic"
+
+[sequence.tbBlue.5.arguments.1]
+type = "run element"
+value = ["sequence.tbBlue.2.result",1,2,"startPixel"]
+operation = "load"
+
+[sequence.tbBlue.5.arguments.2]
+type = "run element"
+value = ["sequence.tbBlue.2.result",1,2,"endPixel"]
+operation = "add"
+
+
+
+[sequence.tbBlue.6]
 function = "cropImage"
 arguments.image.type = "core"
 arguments.image.value = "screenShot_Whole_Image"
