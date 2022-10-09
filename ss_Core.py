@@ -1,6 +1,7 @@
 import sys
 import os
 import imagehash
+import numpy
 from PIL import Image, ImageGrab
 from PIL.Image import Image as ImageClass
 from enum import Enum, auto as enumAuto
@@ -56,6 +57,9 @@ def testColors():
             for color in colors:
                 logSS.info(color)
 
+if __name__ == "__main__":    
 
-if __name__ == "__main__":             
-    testColors()
+    while True:
+        # Screenshot is a PIL Image class PNG of (r,g,b,alpha)
+        screenShot_Whole_Raw = ImageGrab.grab()
+        screenShot_Whole_npArray = numpy.array(screenShot_Whole_Raw).tolist()
