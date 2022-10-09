@@ -15,12 +15,37 @@ except:
 
 from PIL.Image import Image as ImageClass
 
+def getPixelRow_Pixel(im : list[list[tuple[int,int,int,int]]], row : int,\
+    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
+    imLen = len(im)
+    ll = int(imLen * limitPercent_Low)
+    if ll < 0: ll = 0
+    lh = int(imLen * limitPercent_High) + 1 # In python, ranges exclude the upper limit
+    if lh > imLen: lh = imLen
+    return im[row][ll:lh]
 
-def getPixelRow(im : ImageClass, row : int) -> list[tuple[int,int,int]]:
-    return [im.getpixel((i, row)) for i in range(im.width)]
+def getPixelColumn_Pixel(im : list[list[tuple[int,int,int,int]]], column : int, \
+    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
+    imLen = len(im[0])
+    ll = int(imLen * limitPercent_Low)
+    if ll < 0: ll = 0
+    lh = int(imLen * limitPercent_High) + 1 # In python, ranges exclude the upper limit
+    if lh > imLen: lh = imLen
+    return [(row[column][0:3]) for row in im[ll:lh]]
 
-def getPixelColumn(im : ImageClass, column : int) -> list[tuple[int,int,int]]:
-    return [im.getpixel((column, i)) for i in range(im.height)]
+def getPixelRow_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, \
+    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
+    imLen = len(im)
+    row = int(percent * imLen)
+    if row >= imLen: row = imLen - 1
+    return getPixelRow_Pixel(im=im, row=row, limitPercent_Low=limitPercent_Low, limitPercent_High=limitPercent_High)
+
+def getPixelColumn_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, \
+    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
+    imLen = len(im[0])
+    column = int(percent * imLen)
+    if column >= imLen: column = imLen - 1
+    return getPixelColumn_Pixel(im=im, column=column, limitPercent_Low=limitPercent_Low, limitPercent_High=limitPercent_High)
 
 # Returns detection result as bool and ColorScanInstance
 # of single instance or equal list length
@@ -127,4 +152,8 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
         if singleColorInstance:
             return False, colors[0]
         else:
-            return False, colors    
+            return False, colors
+
+
+
+
