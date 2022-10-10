@@ -1,32 +1,62 @@
+[Enum]
+
+[Enum.DialogueLinePercents.BlueGrey]
+Line1_Start =   0.1696428571
+Line1_End =     0.4151785714
+Line2_Start =   0.5848214286
+Line2_End =     0.8303571429
+
+[Enum.DialogueLinePercents.Fight]
+Line1_Start =   0.1761904762
+Line1_End =     0.4380952381
+Line2_Start =   0.6523809524
+Line2_End =     0.9142857143
+
+[Colors]
 
 # Dark blue
-[Colors.Outer_V]
+[Colors.DialogueBlue_Outer_V]
 color       = { r = 72, g = 112, b = 160 }
 tolerance   = 0
 pureReq     = true
 
 # Light blue
-[Colors.Inner_V]
+[Colors.DialogueBlue_Inner_V]
 color       = { r = 160, g = 208, b = 224 }
 tolerance   = 0
 pureReq     = true
 
 # Light blue (same as Inner_V)
-[Colors.Outer_H]
+[Colors.DialogueBlue_Outer_H]
 color       = { r = 160, g = 208, b = 224 }
 tolerance   = 0
 pureReq     = true
 
 # Sort of grey color from the curve aliasing
-[Colors.Inner_H]
+[Colors.DialogueBlue_Inner_H]
 color       = { r = 208, g = 224, b = 240 }
 tolerance   = 0
 pureReq     = true
 
-[Colors.Body]
+[Colors.DialogueBlue_Body]
 color       = { r = 248, g = 248, b = 248 }
 tolerance   = 0
 pureReq     = false # Purity not required because of certainty of finding text pixels
+
+[Colors.RedArrow_BlueGrey_Outer]
+color       = { r = 248, g = 248, b = 248 }
+tolerance   = 0
+pureReq     = true
+
+[Colors.RedArrow_BlueGrey_Inner]
+color       = { r = 96, g = 96, b = 96 }
+tolerance   = 0
+pureReq     = true
+
+[Colors.RedArrow_BlueGrey_Body]
+color       = { r = 224, g = 8, b = 8 }
+tolerance   = 0
+pureReq     = true
 
 [sequence]
 
@@ -35,74 +65,125 @@ pureReq     = false # Purity not required because of certainty of finding text p
 # Get virtical pixel column in the middle of the screen
 [sequence.tbBlue.1]
 function = "getPixelColumn_Percent"
-arguments.image.type = "core"
-arguments.image.value = "screenShot_Whole_npArray"
-arguments.percent.type = "const"
-arguments.percent.value = 0.5
-arguments.limitLowPercent = 0.5
-arguments.limitHighPercent = 1.0
+image.type = "core"
+image.value = "screenShot_Whole_npArray"
+percent.type = "const"
+percent.value = 0.5
+limitLowPercent = 0.5
+limitHighPercent = 1.0
 continue.type = true
 
+# Scan that pixel column for blue dialog box bounding frame colors
 [sequence.tbBlue.2]
 function = "pixelSequenceScan"
-arguments.pixels.type = "run element"
-arguments.pixels.value = "sequence.tbBlue.1.result"
-arguements.colors = ["Outer_V", "Inner_V", "Body", "Inner_V", "Outer_V"]
-continue.type = "run element"
-continue.value = ["sequence.tbBlue.2.result",0]
+pixels.type = "runDictLookup"
+pixels.value = ["sequence","tbBlue",1,"result"]
+arguements.colors = ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]
+continue.type = "runDictLookup"
+continue.value = ["sequence","tbBlue",2,"result",0]
 
 [sequence.tbBlue.3]
 function = "getPixelRow_Pixel"
-arguments.image.type = "core"
-arguments.image.value = "screenShot_Whole_npArray"
-arguments.row.type = "run element"
+image.type = "core"
+image.value = "screenShot_Whole_npArray"
+row.type = "runDictLookup"
 
 # start pixel of Body color
 # result contains (resultBool (success or failure), list[ColorScanInstance)]
 # result[1] points to the list[ColorScanInstance)]
 # result[1][2] points to the third ColorScanInstance (body)
 # result[1][2].startPixel points to the first pixel for detecting the textbox body
-arguments.row.value = ["sequence.tbBlue.2.result",1,2,"startPixel"]
-arguments.limitLowPercent = 0.0
-arguments.limitHighPercent = 1.0
+row.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
+limitLowPercent = 0.0
+limitHighPercent = 1.0
 continue.type = true
 
 [sequence.tbBlue.4]
 function = "pixelSequenceScan"
-arguments.pixels.type = "run element"
-arguments.pixels.value = "sequence.tbBlue.3.result"
-arguements.colors = ["Outer_H", "Inner_H", "Body", "Inner_H", "Outer_H"]
-continue.type = "run element"
-continue.value = ["sequence.tbBlue.4.result",0]
+pixels.type = "runDictLookup"
+pixels.value = ["sequence","tbBlue",3,"result"]
+arguements.colors = ["DialogueBlue_Outer_H", "DialogueBlue_Inner_H", "DialogueBlue_Body", "DialogueBlue_Inner_H", "DialogueBlue_Outer_H"]
+continue.type = "runDictLookup"
+continue.value = ["sequence","tbBlue",4,"result",0]
 
 [sequence.tbBlue.5]
-function = "arithmetic"
-
-[sequence.tbBlue.5.arguments.1]
-type = "run element"
-value = ["sequence.tbBlue.2.result",1,2,"startPixel"]
-operation = "load"
-
-[sequence.tbBlue.5.arguments.2]
-type = "run element"
-value = ["sequence.tbBlue.2.result",1,2,"endPixel"]
-operation = "add"
-
-
+function = "getValue_PercentBetweenValues"
+start.type = "runDictLookup"
+start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
+end.type = "runDictLookup"
+end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
+percent.type = "runDictLookup"
+percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line1_Start"]
 
 [sequence.tbBlue.6]
+function = "getValue_PercentBetweenValues"
+start.type = "runDictLookup"
+start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
+end.type = "runDictLookup"
+end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
+percent.type = "runDictLookup"
+percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line1_End"]
+
+[sequence.tbBlue.7]
 function = "cropImage"
-arguments.image.type = "core"
-arguments.image.value = "screenShot_Whole_Image"
-arguments.topLeft.x.type = "run element"
-arguments.topLeft.x.value = ["sequence.tbBlue.4.result",1,2,"startPixel"]
-arguments.topLeft.y.type = "run element"
-arguments.topLeft.y.value = ["sequence.tbBlue.2.result",1,2,"startPixel"]
-arguments.bottomLeft.x.type = "run element"
-arguments.bottomLeft.x.value = ["sequence.tbBlue.4.result",1,2,"endPixel"]
-arguments.bottomLeft.y.type = "run element"
-arguments.bottomLeft.y.value = ["sequence.tbBlue.2.result",1,2,"endPixel"]
+image.type = "core"
+image.value = "screenShot_Whole_Image"
+topLeft.x.type = "runDictLookup"
+topLeft.x.value = ["sequence","tbBlue",4,"result",1,2,"startPixel"] # Horizontal body startPixel
+topLeft.y.type = "runDictLookup"
+topLeft.y.value = ["sequence","tbBlue",5,"result"] # Line1_Start percent between top and bottom body edge
+bottomRight.x.type = "runDictLookup"
+bottomRight.x.value = ["sequence","tbBlue",4,"result",1,2,"endPixel"] # Horizontal body endPixel
+bottomRight.y.type = "runDictLookup"
+bottomRight.y.value = ["sequence","tbBlue",6,"result"] # Line1_End percent between top and bottom body edge
 continue.type = true
+
+[sequence.tbBlue.8]
+function = "getValue_PercentBetweenValues"
+start.type = "runDictLookup"
+start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
+end.type = "runDictLookup"
+end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
+percent.type = "runDictLookup"
+percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line2_Start"]
+
+[sequence.tbBlue.9]
+function = "getValue_PercentBetweenValues"
+start.type = "runDictLookup"
+start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
+end.type = "runDictLookup"
+end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
+percent.type = "runDictLookup"
+percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line2_End"]
+
+[sequence.tbBlue.10]
+function = "cropImage"
+image.type = "core"
+image.value = "screenShot_Whole_Image"
+topLeft.x.type = "runDictLookup"
+topLeft.x.value = ["sequence","tbBlue",4,"result",1,2,"startPixel"] # Horizontal body startPixel
+topLeft.y.type = "runDictLookup"
+topLeft.y.value = ["sequence","tbBlue",8,"result"] # Line2_Start percent between top and bottom body edge
+bottomRight.x.type = "runDictLookup"
+bottomRight.x.value = ["sequence","tbBlue",4,"result",1,2,"endPixel"] # Horizontal body endPixel
+bottomRight.y.type = "runDictLookup"
+bottomRight.y.value = ["sequence","tbBlue",9,"result"] # Line2_End percent between top and bottom body edge
+continue.type = true
+
+[sequence.tbBlue.11]
+function = "mergeImages_Vertical"
+imageTop.type = "runDictLookup"
+imageTop.value = ["sequence","tbBlue",7,"result"]
+imageBottom.type = "runDictLookup"
+imageBottom.value = ["sequence","tbBlue",10,"result"]
+
+[sequence.tbBlue.12]
+function = "saveImage"
+image.type = "runDictLookup"
+image.value = ["sequence","tbBlue",11,"result"]
+fileName = "test.png"
+
+
 
 
 
