@@ -47,6 +47,9 @@ class PathElement:
 
         self.detect()
 
+# This logic finds the "true" root directory, depending
+# on whether this module is run from within the 
+# \common\ folder
 rootDir = os.path.dirname(os.path.realpath(sys.argv[0]))
 if rootDir[-7:] == "\\common":
     rootDir = rootDir[:-7]
@@ -66,10 +69,6 @@ class SSPath:
         p= os.path.join(dir.path,'common'),
         type= PathType.directory
         )
-    AudioPacks = PathElement(
-        p= os.path.join(dir.path,'Audio Packs'),
-        type= PathType.directory
-        )
     screenshot = PathElement(
         p= os.path.join(common.path, 'screenshot'),
         type= PathType.directory
@@ -82,14 +81,23 @@ class SSPath:
         p= os.path.join(screenshot.path,'logShots'),
         type= PathType.directory
         )
-    
+    profiles = PathElement(
+        p= os.path.join(dir.path,'Profiles'),
+        type= PathType.directory
+    )
+
     # Files
     file_logConfig = PathElement(
-        p= os.path.join(common.path,'logSS.conf'),
+        p= os.path.join(common.path,'logging.conf'),
         type= PathType.file
         )
 
     # Built on script startup
+    selectedProfile = PathElement(
+        p= None,
+        type= PathType.directory
+    )
+
     selectedAudioPack = PathElement(
         p= None,
         type= PathType.directory
