@@ -1,3 +1,6 @@
+name = "Pokemon FireRed"
+version = "1.0.0"
+
 [Enum]
 
 [Enum.DialogueLinePercents.BlueGrey]
