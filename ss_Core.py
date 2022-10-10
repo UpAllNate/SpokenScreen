@@ -10,7 +10,13 @@ from common.ss_Logging import logSS
 from common.ss_PathClasses import SSPath
 from common.ss_ColorClasses import ColorScanInstance, ColorPure
 from common.ss_PixelScanners import getPixelColumn, getPixelRow, pixelSequenceScan
+from typing import Any
 
+def getDVal(d : dict, listPath : list) -> Any:
+    for key in listPath:
+        d = d[key]
+    return d
+    
 def testColors():
 
     c = [
@@ -63,3 +69,15 @@ if __name__ == "__main__":
         # Screenshot is a PIL Image class PNG of (r,g,b,alpha)
         screenShot_Whole_Image = ImageGrab.grab()
         screenShot_Whole_npArray = numpy.array(screenShot_Whole_Image).tolist()
+
+testDict = {
+    "elope" : {
+        "abscond" : {
+            4 : {
+                "never" : 4
+            }
+        }
+    }
+}
+
+
