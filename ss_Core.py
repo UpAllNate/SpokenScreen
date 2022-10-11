@@ -11,7 +11,7 @@ from common.ss_PathClasses import SSPath
 from common.ss_ColorClasses import *
 from common.ss_PixelScanners import *
 from typing import Any
-import toml
+import tomli
 
 def getDVal(d : dict, listPath : list) -> Any:
     for key in listPath:
@@ -83,12 +83,14 @@ def findAllProfiles() -> list[SSProfileInstance]:
     for profilePath in allProfilePaths:
         try:
             runPath = os.path.join(profilePath,'run.toml')
-            with open(runPath) as f:
-                a = toml.load(f)
+            with open(runPath, 'rb') as f:
+                a = tomli.load(f)
                 profileName = a["name"]
                 profileVersion = a["version"]
-        except:
-            pass
+        except KeyError:
+            logSS.warning(f"Invalid profile detected: {profilePath}")
+        except Exception as e:
+            raise e
         else:
             validProfilePaths.append(SSProfileInstance(profileName, profileVersion,profilePath))
     
