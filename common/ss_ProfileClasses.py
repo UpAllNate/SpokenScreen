@@ -1,8 +1,15 @@
 
-from ss_PathClasses import PathElement, SSPath, PathType
 import tomli
 import os
-from ss_Logging import logSS
+try:
+    from common.ss_PathClasses import PathElement, SSPath, PathType
+except:
+    from ss_PathClasses import PathElement, SSPath, PathType
+try:
+    from common.ss_Logging import logSS
+except:
+    from ss_Logging import logSS
+
 
 
 class AudioPackData:
