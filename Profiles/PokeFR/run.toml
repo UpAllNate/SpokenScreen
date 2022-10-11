@@ -61,6 +61,13 @@ color       = { r = 224, g = 8, b = 8 }
 tolerance   = 0
 pureReq     = true
 
+[hash]
+
+[initSequence]
+
+[initSequence.1]
+function = "chooseProfile"
+
 [sequence]
 
 [sequence.tbBlue]
