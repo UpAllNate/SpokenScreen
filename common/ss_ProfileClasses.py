@@ -45,7 +45,7 @@ class ProfileInstance:
 
 def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[ProfileInstance]:
 
-    os.system('cls' if os.name == 'nt' else 'clear')
+    # os.system('cls' if os.name == 'nt' else 'clear')
     print("Loading profiles...")
 
     """

@@ -7,9 +7,10 @@ from PIL.Image import Image as ImageClass
 from enum import Enum, auto as enumAuto
 import winsound
 from common.ss_Logging import logSS
-from common.ss_PathClasses import PathType, SSPath, PathElement
+from common.ss_PathClasses import PathElement, PathType, SSPath, Path
 from common.ss_ColorClasses import *
 from common.ss_PixelScanners import *
+from common.ss_ProfileClasses import findAllProfiles, AudioPackData, ProfileInstance
 from typing import Any
 import tomli
 import time
@@ -65,117 +66,6 @@ def testColors():
             for color in colors:
                 logSS.info(color)
 
-class SSProfileInstance:
-    def __init__(self : str, n, v : str, p : str, a : str) -> None:
-        self.name = n
-        self.version = v
-        self.path = p
-        self.audioPacksPath = a
-    
-    def __str__(self) -> str:
-        return f"{self.name}, v{self.version}"
-
-def findAllProfiles() -> list[SSProfileInstance]:
-    """
-    Scan for all available profiles
-    """
-    allProfilePaths = [ f.path for f in os.scandir(SSPath.profiles.path) if f.is_dir()]
-
-    validProfilePaths = []
-    for profilePath in allProfilePaths:
-
-        # Determine if valid run.toml
-        try:
-            runPath = os.path.join(profilePath,'run.toml')
-            with open(runPath, 'rb') as f:
-                a = tomli.load(f)
-                profileName = a["name"]
-                profileVersion = a["version"]
-                _ = a["sequence"]
-                _ = a["colors"]
-        except KeyError as e:
-            logSS.warning(f"Invalid profile detected: {profilePath}, missing key {e}")
-            continue
-        except FileNotFoundError as e:
-            logSS.warning(f"Invalid profile detected: {profilePath}, missing run file {e}")
-            continue
-        except tomli.TOMLDecodeError as e:
-            logSS.warning(f"Invalid profile detected: {profilePath}, cannot decode run.tomli... corrupted file: {e}")
-            continue
-        except Exception as e:
-            raise e
-
-        if len(a["colors"]) == 0:
-            logSS.warning(f"Invalid profile detected: {profilePath}, no colors in run.toml")
-            continue
-        
-        if len(a["sequence"]) == 0:
-            logSS.warning(f"Invalid profile detected: {profilePath}, no sequences in run.toml")
-            continue
-        
-        # Determine if has Audio Packs directory
-        audioPath = PathElement(PathType.directory, os.path.join(profilePath, "Audio Packs"))
-        if not audioPath.detect():
-            logSS.warning(f"Invalid profile detected: {profilePath}, does not have Audio Packs folder")
-            continue
-
-        allValidAudioPacks : AudioPackData = []
-
-        # Scan the AudioPack directory for all installed packs
-        allAudioPacks = [ a.path for a in os.scandir(prof.audioPacksPath) if a.is_dir()]
-
-        # Compile only those directories with an Audio Pack Description file that contains a title and hash table
-        for packDir in allAudioPacks:
-
-            print(f"AudioPack Directory: {packDir}")
-
-            # Audio Pack Description
-            file = Path(os.path.join(packDir,'AudioPackDescription.toml'))
-
-            print(f"AudioPack Description file: {file}")
-
-            if not file.is_file():
-                print("Description does not exist")
-                continue
-
-            names = []
-            with open(file, mode='r') as file_csv:
-                # Create csv reader object of hashtable csv
-                reader_obj = csv.reader(file_csv)
-
-                
-                names.append(n)
-                print(f"Appended name: {n}")
-
-            file = os.path.join(packDir,'hashTable.csv')
-
-            if not pathFunction(file).is_file():
-                print("hashTable.csv is not a file")
-                break
-            if not checkHashTable(file):
-                print("hashTable.csv check failure")
-                break
-
-            allValidAudioPacks.append(AudioPackData(title, names, file, packDir))
-
-            validProfilePaths.append(SSProfileInstance(profileName, profileVersion,profilePath,audioPath))
-
-class AudioPackData:
-    def __init__(self, title : str, authors : list[str] , hashPath, packPath : str) -> None:
-        self.title = title
-        self.authors = authors
-        self.path = packPath
-        self.audioFileDict = {}
-
-    def __str__(self):
-        msg = f"AudioPack: {self.title}, Authors: "
-        for i, a in enumerate(self.authors):
-            msg += f"{a}"
-            if i < len(self.authors) - 1:
-                msg += ", "
-        msg += "\n"
-        return msg
-
 # Returns valid selection
 def chooseFromList(prompt : str, l : list) -> int:
     choosing = True
@@ -208,7 +98,78 @@ def chooseFromList(prompt : str, l : list) -> int:
 
 if __name__ == "__main__":
 
-    allProfiles = findAllProfiles()
+    set = [True, True, True]
+    print(f"Require sequence: {set[0]}, color: {set[1]}, audio: {set[2]}")
+    allProfiles = findAllProfiles(set[0], set[1], set[2])
+    print("Found: ", end="")
+    if allProfiles:
+        for p in allProfiles:
+            print(p, end="")
+    else:
+        print("None", end="")
+    print()
+    print()
+
+    set = [False, True, True]
+    print(f"Require sequence: {set[0]}, color: {set[1]}, audio: {set[2]}")
+    allProfiles = findAllProfiles(set[0], set[1], set[2])
+    print("Found: ", end="")
+    if allProfiles:
+        for p in allProfiles:
+            print(p, end="")
+    else:
+        print("None", end="")
+    print()
+    print()
+        
+    set = [True, False, True]
+    print(f"Require sequence: {set[0]}, color: {set[1]}, audio: {set[2]}")
+    allProfiles = findAllProfiles(set[0], set[1], set[2])
+    print("Found: ", end="")
+    if allProfiles:
+        for p in allProfiles:
+            print(p, end="")
+    else:
+        print("None", end="")
+    print()
+    print()
+        
+    set = [True, True, False]
+    print(f"Require sequence: {set[0]}, color: {set[1]}, audio: {set[2]}")
+    allProfiles = findAllProfiles(set[0], set[1], set[2])
+    print("Found: ", end="")
+    if allProfiles:
+        for p in allProfiles:
+            print(p, end="")
+    else:
+        print("None", end="")
+    print()
+    print()
+        
+    set = [True, False, False]
+    print(f"Require sequence: {set[0]}, color: {set[1]}, audio: {set[2]}")
+    allProfiles = findAllProfiles(set[0], set[1], set[2])
+    print("Found: ", end="")
+    if allProfiles:
+        for p in allProfiles:
+            print(p, end="")
+    else:
+        print("None", end="")
+    print()
+    print()
+        
+    set = [False, False, False]
+    print(f"Require sequence: {set[0]}, color: {set[1]}, audio: {set[2]}")
+    allProfiles = findAllProfiles(set[0], set[1], set[2])
+    print("Found: ", end="")
+    if allProfiles:
+        for p in allProfiles:
+            print(p, end="")
+    else:
+        print("None", end="")
+    print()
+    print()
+            
     exit()
     selectedProfileIndex = chooseFromList("Please choose from the following profiles:", allProfiles)
 
