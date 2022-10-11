@@ -19,19 +19,27 @@ class PathElement:
             p = Path(self.path)
             if self.type == PathType.directory:
                 if not p.is_dir():
+                    self.present = False
                     if self.required:
                         logSS.error(f"Directory missing at {self.path}")
                         raise ImportError(f"Required directory missing at: {self.path}")
                     else:
                         logSS.warning(f"Directory missing at {self.path}")
+                else:
+                    self.present = True
                 
             elif self.type == PathType.file:
                 if not p.is_file():
+                    self.present = False
                     if self.required:
                         logSS.error(f"Directory missing at {self.path}")
                         raise ImportError(f"Required file ")
                     else:
                         logSS.warning(f"Directory missing at {self.path}")
+                else:
+                    self.present = True
+        
+        return self.present
 
     def __init__(self, type : PathType, p : str, req : bool = False):
         self.path = p
