@@ -12,6 +12,7 @@ from common.ss_ColorClasses import *
 from common.ss_PixelScanners import *
 from typing import Any
 import tomli
+import time
 
 def getDVal(d : dict, listPath : list) -> Any:
     for key in listPath:
@@ -87,26 +88,67 @@ def findAllProfiles() -> list[SSProfileInstance]:
                 a = tomli.load(f)
                 profileName = a["name"]
                 profileVersion = a["version"]
-        except KeyError:
-            logSS.warning(f"Invalid profile detected: {profilePath}")
+        except KeyError as e:
+            logSS.warning(f"Invalid profile detected: {profilePath}, missing attribute {e}")
+        except FileNotFoundError as e:
+            logSS.warning(f"Invalid profile detected: {profilePath}, missing run file {e}")
+        except tomli.TOMLDecodeError as e:
+            logSS.warning(f"Invalid profile detected: {profilePath}, cannot decode run.tomli... corrupted file: {e}")
         except Exception as e:
             raise e
         else:
             validProfilePaths.append(SSProfileInstance(profileName, profileVersion,profilePath))
-    
+
     return validProfilePaths
+
+def chooseFromList(prompt : str, l : list):
+    choosing = True
+    selectionMenu = prompt + "\n\n"
+
+    while choosing:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        
+        for i, p in enumerate(l):
+            selectionMenu += f"[{i}] : {str(p)}\n"
+
+        selectionMenu += "\nPlease enter the selection number: "
+
+        try:
+            selection = int(input(selectionMenu))
+        except KeyboardInterrupt:
+            exit()
+        except:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print("That is not a number.")
+            time.sleep(2)
+            os.system('cls' if os.name == 'nt' else 'clear')
+        else:
+            if selection < 0 or selection >= len(l):
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print("That is not a valid selection")
+                time.sleep(2)
+            else:
+                choosing = False
 
 if __name__ == "__main__":
 
     allProfiles = findAllProfiles()
 
-    for p in allProfiles:
-        print(p)
+    chooseFromList("Please choose from the following profiles:", allProfiles)
 
     while True:
         # Screenshot is a PIL Image class PNG of (r,g,b,alpha)
         screenShot_Whole_Image = ImageGrab.grab()
         screenShot_Whole_npArray = numpy.array(screenShot_Whole_Image).tolist()
     
+        # for _seq in run["sequence"]:
+        # seq = run["sequence"][_seq]
 
+        # print(f"\nRunning sequence {seq['name']}\n\n")
+
+        # for step in range(1,len(seq)+1):
+        #     stepStr = str(step)
+
+        #     if seq[stepStr]["function"] == "getNumbers":
+        #         seq[stepStr]["result"] = getNumbers()
 
