@@ -1,62 +1,62 @@
 name = "Pokemon FireRed"
 version = "1.0.0"
 
-[Enum]
+[enum]
 
-[Enum.DialogueLinePercents.BlueGrey]
+[enum.DialogueLinePercents.BlueGrey]
 Line1_Start =   0.1696428571
 Line1_End =     0.4151785714
 Line2_Start =   0.5848214286
 Line2_End =     0.8303571429
 
-[Enum.DialogueLinePercents.Fight]
+[enum.DialogueLinePercents.Fight]
 Line1_Start =   0.1761904762
 Line1_End =     0.4380952381
 Line2_Start =   0.6523809524
 Line2_End =     0.9142857143
 
-[Colors]
+[colors]
 
 # Dark blue
-[Colors.DialogueBlue_Outer_V]
+[colors.DialogueBlue_Outer_V]
 color       = { r = 72, g = 112, b = 160 }
 tolerance   = 0
 pureReq     = true
 
 # Light blue
-[Colors.DialogueBlue_Inner_V]
+[colors.DialogueBlue_Inner_V]
 color       = { r = 160, g = 208, b = 224 }
 tolerance   = 0
 pureReq     = true
 
 # Light blue (same as Inner_V)
-[Colors.DialogueBlue_Outer_H]
+[colors.DialogueBlue_Outer_H]
 color       = { r = 160, g = 208, b = 224 }
 tolerance   = 0
 pureReq     = true
 
 # Sort of grey color from the curve aliasing
-[Colors.DialogueBlue_Inner_H]
+[colors.DialogueBlue_Inner_H]
 color       = { r = 208, g = 224, b = 240 }
 tolerance   = 0
 pureReq     = true
 
-[Colors.DialogueBlue_Body]
+[colors.DialogueBlue_Body]
 color       = { r = 248, g = 248, b = 248 }
 tolerance   = 0
 pureReq     = false # Purity not required because of certainty of finding text pixels
 
-[Colors.RedArrow_BlueGrey_Outer]
+[colors.RedArrow_BlueGrey_Outer]
 color       = { r = 248, g = 248, b = 248 }
 tolerance   = 0
 pureReq     = true
 
-[Colors.RedArrow_BlueGrey_Inner]
+[colors.RedArrow_BlueGrey_Inner]
 color       = { r = 96, g = 96, b = 96 }
 tolerance   = 0
 pureReq     = true
 
-[Colors.RedArrow_BlueGrey_Body]
+[colors.RedArrow_BlueGrey_Body]
 color       = { r = 224, g = 8, b = 8 }
 tolerance   = 0
 pureReq     = true
@@ -92,9 +92,9 @@ image.value = "screenShot_Whole_npArray"
 row.type = "runDictLookup"
 
 # start pixel of Body color
-# result contains (resultBool (success or failure), list[ColorScanInstance)]
-# result[1] points to the list[ColorScanInstance)]
-# result[1][2] points to the third ColorScanInstance (body)
+# result contains (resultBool (success or failure), list[colorscanInstance)]
+# result[1] points to the list[colorscanInstance)]
+# result[1][2] points to the third colorscanInstance (body)
 # result[1][2].startPixel points to the first pixel for detecting the textbox body
 row.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
 limitLowPercent = 0.0
@@ -116,7 +116,7 @@ start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
 end.type = "runDictLookup"
 end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
 percent.type = "runDictLookup"
-percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line1_Start"]
+percent.value = ["enum","DialogueLinePercents","BlueGrey","Line1_Start"]
 
 [sequence.tbBlue.6]
 function = "getValue_PercentBetweenValues"
@@ -125,7 +125,7 @@ start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
 end.type = "runDictLookup"
 end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
 percent.type = "runDictLookup"
-percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line1_End"]
+percent.value = ["enum","DialogueLinePercents","BlueGrey","Line1_End"]
 
 [sequence.tbBlue.7]
 function = "cropImage"
@@ -148,7 +148,7 @@ start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
 end.type = "runDictLookup"
 end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
 percent.type = "runDictLookup"
-percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line2_Start"]
+percent.value = ["enum","DialogueLinePercents","BlueGrey","Line2_Start"]
 
 [sequence.tbBlue.9]
 function = "getValue_PercentBetweenValues"
@@ -157,7 +157,7 @@ start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
 end.type = "runDictLookup"
 end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
 percent.type = "runDictLookup"
-percent.value = ["Enum","DialogueLinePercents","BlueGrey","Line2_End"]
+percent.value = ["enum","DialogueLinePercents","BlueGrey","Line2_End"]
 
 [sequence.tbBlue.10]
 function = "cropImage"
