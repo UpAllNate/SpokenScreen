@@ -33,7 +33,7 @@ class PathElement:
                     else:
                         logSS.warning(f"Directory missing at {self.path}")
 
-    def __init__(self, type : PathType, p : str, req : bool = False) -> None:
+    def __init__(self, type : PathType, p : str, req : bool = False):
         self.path = p
         logSS.debug(f"Path set: {p}")
         self.present = False
@@ -42,7 +42,7 @@ class PathElement:
 
         # Error check PathType input
         if self.type not in [i for i in PathType]:
-            logSS.error(f"Incorrect path type defined: {self.type}")
+            logSS.critical(f"Incorrect path type defined: {self.type}")
             raise ImportError(f"Incorrect path type defined: {self.type}")
 
         self.detect()
