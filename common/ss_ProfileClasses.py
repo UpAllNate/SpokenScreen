@@ -10,8 +10,6 @@ try:
 except:
     from ss_Logging import logSS
 
-
-
 class AudioPackData:
     def __init__(self, title : str, authors : list[str] , packPath : str, adict : dict) -> None:
         self.title = title
@@ -35,7 +33,7 @@ class ProfileInstance:
         self.path = p
         self.audioPacksPath = a
         self.audioPacksPathList = ali
-    
+
     def __str__(self) -> str:
         return f"{self.name}, v{self.version}"
 
@@ -80,14 +78,14 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
             logSS.warning(f"Invalid profile detected: {profilePath}, no colors in run.toml")
             if reqCol:
                 continue
-        
+
         if len(a["sequence"]) == 0:
             logSS.warning(f"Invalid profile detected: {profilePath}, no sequences in run.toml")
             if reqSeq:
                 continue
 
         # At this point, run.toml is presumed to be valid
-        
+
         # Determine if this profile has the required Audio Packs directory
         audioPath = PathElement(PathType.directory, os.path.join(profilePath, "Audio Packs"))
         if not audioPath.detect():
@@ -103,7 +101,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
         for packDir in audioPackPaths:
 
             # Audio Pack Description
-            filePathStr = os.path.join(packDir,'desc.toml')           
+            filePathStr = os.path.join(packDir,'desc.toml')
             try:
                 desc = tomli.load(open(filePathStr, 'rb'))
                 title = desc["title"]
@@ -129,7 +127,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
                 continue
 
             allValidAudioPacks.append(AudioPackData(title, authors, filePathStr, aDict))
-        
+
         if len(allValidAudioPacks) == 0 and reqAud:
             logSS.warning(f"Invalid Profile detected in: {profilePath}, has no valid Audio Pack")
             continue
@@ -137,4 +135,3 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
         validProfilePaths.append(ProfileInstance(profileName, profileVersion, profilePath, audioPath.path, allValidAudioPacks))
 
     return validProfilePaths
-
