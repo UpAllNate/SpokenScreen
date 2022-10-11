@@ -114,7 +114,8 @@ class AudioPackData:
         self.title = title
         self.authors = authors
         self.path = packPath
-    
+        self.audioFileDict = {}
+
     def __str__(self):
         msg = f"AudioPack: {self.title}, Authors: "
         for i, a in enumerate(self.authors):
