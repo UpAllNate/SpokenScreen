@@ -7,7 +7,7 @@ name = "pypi"
 requests = "*"
 imagehash = "*"
 six = "*"
-toml = "*"
+tomli = "*"
 numpy = "*"
 
 [dev-packages]
