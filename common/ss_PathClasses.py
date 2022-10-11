@@ -2,7 +2,7 @@ import os
 import sys
 from dataclasses import dataclass
 from enum import Enum, auto as enumAuto
-from pathlib import Path as PathFunction
+from pathlib import Path
 try:
     from common.ss_Logging import logSS
 except:
@@ -16,7 +16,7 @@ class PathElement:
     def detect(self) -> bool:
         # Error check presence of directory / file
         if self.path is not None:
-            p = PathFunction(self.path)
+            p = Path(self.path)
             if self.type == PathType.directory:
                 if not p.is_dir():
                     if self.required:
