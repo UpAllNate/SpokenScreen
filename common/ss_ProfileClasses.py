@@ -28,7 +28,7 @@ class AudioPackData:
         msg += "\n"
         return msg
 
-class SSProfileInstance:
+class ProfileInstance:
     def __init__(self : str, n, v : str, p : str, a : str, ali : list[AudioPackData]) -> None:
         self.name = n
         self.version = v
@@ -39,7 +39,7 @@ class SSProfileInstance:
     def __str__(self) -> str:
         return f"{self.name}, v{self.version}"
 
-def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[SSProfileInstance]:
+def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[ProfileInstance]:
 
     os.system('cls' if os.name == 'nt' else 'clear')
     print("Loading profiles...")
@@ -134,7 +134,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[SSProfi
             logSS.warning(f"Invalid Profile detected in: {profilePath}, has no valid Audio Pack")
             continue
 
-        validProfilePaths.append(SSProfileInstance(profileName, profileVersion, profilePath, audioPath.path, allValidAudioPacks))
+        validProfilePaths.append(ProfileInstance(profileName, profileVersion, profilePath, audioPath.path, allValidAudioPacks))
 
     return validProfilePaths
 
