@@ -66,10 +66,11 @@ def testColors():
                 logSS.info(color)
 
 class SSProfileInstance:
-    def __init__(self : str, n, v : str, p : str) -> None:
+    def __init__(self : str, n, v : str, p : str, a : str) -> None:
         self.name = n
         self.version = v
         self.path = p
+        self.audioPacksPath = a
     
     def __str__(self) -> str:
         return f"{self.name}, v{self.version}"
@@ -82,14 +83,18 @@ def findAllProfiles() -> list[SSProfileInstance]:
 
     validProfilePaths = []
     for profilePath in allProfilePaths:
+
+        # Determine if valid run.toml
         try:
             runPath = os.path.join(profilePath,'run.toml')
             with open(runPath, 'rb') as f:
                 a = tomli.load(f)
                 profileName = a["name"]
                 profileVersion = a["version"]
+                _ = a["sequence"]
+                _ = a["colors"]
         except KeyError as e:
-            logSS.warning(f"Invalid profile detected: {profilePath}, missing attribute {e}")
+            logSS.warning(f"Invalid profile detected: {profilePath}, missing key {e}")
             continue
         except FileNotFoundError as e:
             logSS.warning(f"Invalid profile detected: {profilePath}, missing run file {e}")
@@ -99,15 +104,61 @@ def findAllProfiles() -> list[SSProfileInstance]:
             continue
         except Exception as e:
             raise e
+
+        if len(a["colors"]) == 0:
+            logSS.warning(f"Invalid profile detected: {profilePath}, no colors in run.toml")
+            continue
         
+        if len(a["sequence"]) == 0:
+            logSS.warning(f"Invalid profile detected: {profilePath}, no sequences in run.toml")
+            continue
+        
+        # Determine if has Audio Packs directory
         audioPath = PathElement(PathType.directory, os.path.join(profilePath, "Audio Packs"))
         if not audioPath.detect():
             logSS.warning(f"Invalid profile detected: {profilePath}, does not have Audio Packs folder")
             continue
 
-        validProfilePaths.append(SSProfileInstance(profileName, profileVersion,profilePath))
+        allValidAudioPacks : AudioPackData = []
 
-    return validProfilePaths
+        # Scan the AudioPack directory for all installed packs
+        allAudioPacks = [ a.path for a in os.scandir(prof.audioPacksPath) if a.is_dir()]
+
+        # Compile only those directories with an Audio Pack Description file that contains a title and hash table
+        for packDir in allAudioPacks:
+
+            print(f"AudioPack Directory: {packDir}")
+
+            # Audio Pack Description
+            file = Path(os.path.join(packDir,'AudioPackDescription.toml'))
+
+            print(f"AudioPack Description file: {file}")
+
+            if not file.is_file():
+                print("Description does not exist")
+                continue
+
+            names = []
+            with open(file, mode='r') as file_csv:
+                # Create csv reader object of hashtable csv
+                reader_obj = csv.reader(file_csv)
+
+                
+                names.append(n)
+                print(f"Appended name: {n}")
+
+            file = os.path.join(packDir,'hashTable.csv')
+
+            if not pathFunction(file).is_file():
+                print("hashTable.csv is not a file")
+                break
+            if not checkHashTable(file):
+                print("hashTable.csv check failure")
+                break
+
+            allValidAudioPacks.append(AudioPackData(title, names, file, packDir))
+
+            validProfilePaths.append(SSProfileInstance(profileName, profileVersion,profilePath,audioPath))
 
 class AudioPackData:
     def __init__(self, title : str, authors : list[str] , hashPath, packPath : str) -> None:
@@ -124,50 +175,6 @@ class AudioPackData:
                 msg += ", "
         msg += "\n"
         return msg
-
-def findAllAudioPacks(prof : SSProfileInstance) -> list[AudioPackData]:
-    allValidAudioPacks : AudioPackData = []
-
-
-
-    # Scan the AudioPack directory for all installed packs
-    allAudioPacks = [ a.path for a in os.scandir(prof.path) if a.is_dir()]
-
-    # Compile only those directories with an Audio Pack Description file that contains a title and hash table
-    for packDir in allAudioPacks:
-
-        print(f"AudioPack Directory: {packDir}")
-
-        # Audio Pack Description
-        file = Path(os.path.join(packDir,'AudioPackDescription.toml'))
-
-        print(f"AudioPack Description file: {file}")
-
-        if not file.is_file():
-            print("Description does not exist")
-            continue
-
-        names = []
-        with open(file, mode='r') as file_csv:
-            # Create csv reader object of hashtable csv
-            reader_obj = csv.reader(file_csv)
-
-            
-            names.append(n)
-            print(f"Appended name: {n}")
-
-        file = os.path.join(packDir,'hashTable.csv')
-
-        if not pathFunction(file).is_file():
-            print("hashTable.csv is not a file")
-            break
-        if not checkHashTable(file):
-            print("hashTable.csv check failure")
-            break
-
-        allValidAudioPacks.append(AudioPackData(title, names, file, packDir))
-
-
 
 # Returns valid selection
 def chooseFromList(prompt : str, l : list) -> int:
