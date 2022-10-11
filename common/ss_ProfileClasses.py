@@ -37,6 +37,12 @@ class ProfileInstance:
     def __str__(self) -> str:
         return f"{self.name}, v{self.version}"
 
+
+# If reqSeq is set, this function will not return any profiles that don't have a run.toml["sequence"] length > 0
+# If reqCol is set, this function will not return any profiles that don't have a run.toml["colors"] length > 0
+# If reqAud is set, this function will not return any audio packs that don't have at least one valid audio file
+# If reqAud is set, this function will not return any profiles that don't have at least one valid audio pack
+
 def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[ProfileInstance]:
 
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -120,7 +126,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
                 raise e
 
             # Get all numerically named .wav files in pack directory
-            aDict = { fileName.split('.')[0]:fileName for fileName in [f for f in os.listdir(dir) if f.endswith('.wav') and f.split('.')[0].isnumeric()]}
+            aDict = { int(fileName.split('.')[0]):fileName for fileName in [f for f in os.listdir(dir) if f.endswith('.wav') and f.split('.')[0].isnumeric()]}
 
             if len(aDict) == 0 and reqAud:
                 logSS.warning(f"Invalid Audio Pack detected in: {profilePath}, pack: {packDir} has no valid audio files")
