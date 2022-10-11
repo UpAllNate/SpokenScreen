@@ -7,7 +7,7 @@ from PIL.Image import Image as ImageClass
 from enum import Enum, auto as enumAuto
 import winsound
 from common.ss_Logging import logSS
-from common.ss_PathClasses import SSPath
+from common.ss_PathClasses import PathType, SSPath, PathElement
 from common.ss_ColorClasses import *
 from common.ss_PixelScanners import *
 from typing import Any
@@ -66,13 +66,13 @@ def testColors():
                 logSS.info(color)
 
 class SSProfileInstance:
-    def __init__(self, n, v, p) -> None:
+    def __init__(self : str, n, v : str, p : str) -> None:
         self.name = n
         self.version = v
         self.path = p
     
     def __str__(self) -> str:
-        return f"Name: {self.name}, Version: {self.version}"
+        return f"{self.name}, v{self.version}"
 
 def findAllProfiles() -> list[SSProfileInstance]:
     """
@@ -90,18 +90,86 @@ def findAllProfiles() -> list[SSProfileInstance]:
                 profileVersion = a["version"]
         except KeyError as e:
             logSS.warning(f"Invalid profile detected: {profilePath}, missing attribute {e}")
+            continue
         except FileNotFoundError as e:
             logSS.warning(f"Invalid profile detected: {profilePath}, missing run file {e}")
+            continue
         except tomli.TOMLDecodeError as e:
             logSS.warning(f"Invalid profile detected: {profilePath}, cannot decode run.tomli... corrupted file: {e}")
+            continue
         except Exception as e:
             raise e
-        else:
-            validProfilePaths.append(SSProfileInstance(profileName, profileVersion,profilePath))
+        
+        audioPath = PathElement(PathType.directory, os.path.join(profilePath, "Audio Packs"))
+        if not audioPath.detect():
+            logSS.warning(f"Invalid profile detected: {profilePath}, does not have Audio Packs folder")
+            continue
+
+        validProfilePaths.append(SSProfileInstance(profileName, profileVersion,profilePath))
 
     return validProfilePaths
 
-def chooseFromList(prompt : str, l : list):
+class AudioPackData:
+    def __init__(self, title : str, authors : list[str] , hashPath, packPath : str) -> None:
+        self.title = title
+        self.authors = authors
+        self.path = packPath
+    
+    def __str__(self):
+        msg = f"AudioPack: {self.title}, Authors: "
+        for i, a in enumerate(self.authors):
+            msg += f"{a}"
+            if i < len(self.authors) - 1:
+                msg += ", "
+        msg += "\n"
+        return msg
+
+def findAllAudioPacks(prof : SSProfileInstance) -> list[AudioPackData]:
+    allValidAudioPacks : AudioPackData = []
+
+
+
+    # Scan the AudioPack directory for all installed packs
+    allAudioPacks = [ a.path for a in os.scandir(prof.path) if a.is_dir()]
+
+    # Compile only those directories with an Audio Pack Description file that contains a title and hash table
+    for packDir in allAudioPacks:
+
+        print(f"AudioPack Directory: {packDir}")
+
+        # Audio Pack Description
+        file = Path(os.path.join(packDir,'AudioPackDescription.toml'))
+
+        print(f"AudioPack Description file: {file}")
+
+        if not file.is_file():
+            print("Description does not exist")
+            continue
+
+        names = []
+        with open(file, mode='r') as file_csv:
+            # Create csv reader object of hashtable csv
+            reader_obj = csv.reader(file_csv)
+
+            
+            names.append(n)
+            print(f"Appended name: {n}")
+
+        file = os.path.join(packDir,'hashTable.csv')
+
+        if not pathFunction(file).is_file():
+            print("hashTable.csv is not a file")
+            break
+        if not checkHashTable(file):
+            print("hashTable.csv check failure")
+            break
+
+        allValidAudioPacks.append(AudioPackData(title, names, file, packDir))
+
+
+
+# Returns valid selection
+def chooseFromList(prompt : str, l : list) -> int:
     choosing = True
     selectionMenu = prompt + "\n\n"
 
@@ -133,8 +201,8 @@ def chooseFromList(prompt : str, l : list):
 if __name__ == "__main__":
 
     allProfiles = findAllProfiles()
-
-    chooseFromList("Please choose from the following profiles:", allProfiles)
+    exit()
+    selectedProfileIndex = chooseFromList("Please choose from the following profiles:", allProfiles)
 
     while True:
         # Screenshot is a PIL Image class PNG of (r,g,b,alpha)
