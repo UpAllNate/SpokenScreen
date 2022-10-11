@@ -46,6 +46,9 @@ class PathElement:
             raise ImportError(f"Incorrect path type defined: {self.type}")
 
         self.detect()
+    
+    def __str__(self) -> str:
+        return self.path
 
 # This logic finds the "true" root directory, depending
 # on whether this module is run from within the 
