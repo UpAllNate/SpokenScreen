@@ -46,7 +46,7 @@ color       = { r = 248, g = 248, b = 248 }
 tolerance   = 0
 pureReq     = false # Purity not required because of certainty of finding text pixels
 
-[colors.RedArrow_BlueGrey_Outer]
+[colors.RedArrow_BlueGrey_Background]
 color       = { r = 248, g = 248, b = 248 }
 tolerance   = 0
 pureReq     = true
@@ -75,20 +75,27 @@ function = "chooseProfile"
 # Get virtical pixel column in the middle of the screen
 [sequence.tbBlue.1]
 function = "getPixelColumn_Percent"
+
 image.type = "core"
 image.value = "screenShot_Whole_npArray"
+
 percent.type = "const"
-percent.value = 0.5
-limitLowPercent = 0.5
-limitHighPercent = 1.0
-continue.type = true
+percent.value = 0.5 # Middle of screen
+percentLow.type = "const"
+percentLow.value = 0.5 # Lower half of screen
+percentHigh.type = "const"
+percentHigh.value = 1.0 # To bottom of screen
+
+continue.type = "const"
+continue.value = true
 
 # Scan that pixel column for blue dialog box bounding frame colors
 [sequence.tbBlue.2]
 function = "pixelSequenceScan"
+
 pixels.type = "runDictLookup"
 pixels.value = ["sequence","tbBlue",1,"result"]
-arguements.colors = ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]
+colors = ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]
 continue.type = "runDictLookup"
 continue.value = ["sequence","tbBlue",2,"result",0]
 
