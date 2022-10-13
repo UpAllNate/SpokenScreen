@@ -15,37 +15,46 @@ except:
 
 from PIL.Image import Image as ImageClass
 
-def getPixelRow_Pixel(im : list[list[tuple[int,int,int,int]]], row : int,\
-    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
-    imLen = len(im)
-    ll = int(imLen * limitPercent_Low)
-    if ll < 0: ll = 0
-    lh = int(imLen * limitPercent_High) + 1 # In python, ranges exclude the upper limit
-    if lh > imLen: lh = imLen
+def getPixelRow_Absolute(im : list[list[tuple[int,int,int,int]]], row : int, limit_Low : int = None, limit_High : int = None) -> list[list[int,int,int]]:
+    numberOfRows = len(im)
+    ll = limit_Low
+    if ll is None: ll = 0
+    lh = limit_High
+    if lh is None: lh = numberOfRows + 1
     return im[row][ll:lh]
 
-def getPixelColumn_Pixel(im : list[list[tuple[int,int,int,int]]], column : int, \
-    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
-    imLen = len(im[0])
-    ll = int(imLen * limitPercent_Low)
-    if ll < 0: ll = 0
-    lh = int(imLen * limitPercent_High) + 1 # In python, ranges exclude the upper limit
-    if lh > imLen: lh = imLen
+def getPixelColumn_Absolute(im : list[list[tuple[int,int,int,int]]], column : int, limit_Low : int = None, limit_High : int = None) -> list[list[int,int,int]]:
+    numberOfColumns = len(im[0]) # How many columns
+    ll = limit_Low
+    if ll is None: ll = 0
+    lh = limit_High
+    if lh is None: lh = numberOfColumns + 1
     return [(row[column][0:3]) for row in im[ll:lh]]
 
-def getPixelRow_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, \
-    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
-    imLen = len(im)
-    row = int(percent * imLen)
-    if row >= imLen: row = imLen - 1
-    return getPixelRow_Pixel(im=im, row=row, limitPercent_Low=limitPercent_Low, limitPercent_High=limitPercent_High)
+def getPercentOfRange(low, high, percent : float):
+    len = high - low
+    if percent <= 0.0:
+        return low
+    elif percent >= 1.0:
+        return high
+    else:
+        return percent * len + low
 
-def getPixelColumn_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, \
-    limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[tuple[int,int,int]]:
-    imLen = len(im[0])
-    column = int(percent * imLen)
-    if column >= imLen: column = imLen - 1
-    return getPixelColumn_Pixel(im=im, column=column, limitPercent_Low=limitPercent_Low, limitPercent_High=limitPercent_High)
+def getPixelRow_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[list[int,int,int]]:
+    numberOfRows = len(im)
+    upperLimit = numberOfRows + 1
+    row = int(getPercentOfRange(0, upperLimit, percent))
+    ll = int(getPercentOfRange(0, upperLimit, limitPercent_Low))
+    lh = int(getPercentOfRange(0, upperLimit, limitPercent_High))
+    return im[row][ll:lh]
+
+def getPixelColumn_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, limitPercent_Low : float = 0.0, limitPercent_High : float = 1.0) -> list[list[int,int,int]]:
+    numberOfColumns = len(im[0])
+    upperLimit = numberOfColumns + 1
+    column = int(getPercentOfRange(0, upperLimit, percent))
+    ll = int(getPercentOfRange(0, upperLimit, limitPercent_Low))
+    lh = int(getPercentOfRange(0, upperLimit, limitPercent_High))
+    return [(row[column][0:3]) for row in im[ll:lh]]
 
 # Returns detection result as bool and ColorScanInstance
 # of single instance or equal list length
