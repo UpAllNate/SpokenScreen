@@ -1,6 +1,12 @@
 from typing import Any
-from ss_PixelScanners import *
-from ss_ColorClasses import ColorScanInstance
+try:
+    from common.ss_PixelScanners import *
+except:
+    from ss_PixelScanners import *
+try:
+    from common.ss_ColorClasses import ColorScanInstance
+except:
+    from ss_ColorClasses import ColorScanInstance
 
 # Recursively dig through dictionary to retrieve value
 def getDVal(d : dict, listPath : list) -> Any:
