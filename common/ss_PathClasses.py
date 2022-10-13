@@ -113,3 +113,8 @@ class SSPath:
         p= None,
         type= PathType.directory
     )
+
+    runTOML = PathElement(
+        p= None,
+        type= PathType.directory
+    )
