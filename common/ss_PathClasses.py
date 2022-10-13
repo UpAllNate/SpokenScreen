@@ -116,5 +116,5 @@ class SSPath:
 
     runTOML = PathElement(
         p= None,
-        type= PathType.directory
+        type= PathType.file
     )
