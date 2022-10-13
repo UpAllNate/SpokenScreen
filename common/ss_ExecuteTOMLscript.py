@@ -57,6 +57,10 @@ def seqEx_getPixelColumn_Percent(step : dict, run : dict, coreFeatures : dict) -
     [im, column, lowPercent, highPercent] = [getArgVal(step[arg], run, coreFeatures) for arg in args]    
     step["result"] = getPixelColumn_Percent(im, column, lowPercent, highPercent)
 
+"""
+This dictionary is the link between the function text in a sequence step
+and the actual method called.
+"""
 seqEx = {
     "getPixelRow_Absolute" : seqEx_getPixelRow_Absolute,
     "getPixelColumn_Absolute" : seqEx_getPixelColumn_Absolute,
