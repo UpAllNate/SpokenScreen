@@ -23,6 +23,8 @@ class AudioPackData:
             msg += f"{a}"
             if i < len(self.authors) - 1:
                 msg += ", "
+        msg += ", audio files: "
+        msg += str(len(self.audioFileDict))
         msg += "\n"
         return msg
 
@@ -32,7 +34,7 @@ class ProfileInstance:
         self.version = v
         self.path = p
         self.audioPacksPath = a
-        self.audioPacksPathList = ali
+        self.audioPacksList = ali
 
     def __str__(self) -> str:
         return f"{self.name}, v{self.version}"
