@@ -26,8 +26,12 @@ def parseSeqStepIndexes(seq : dict) -> list[str]:
     return [str(step) for step in steps]
 
 # For a function argument in a sequence step, retrive the desired value
-def getArgVal(arg : dict, run : dict) -> Any:
-    argType, argValue = arg["type"], arg["value"]
+def getArgVal(step : dict, arg : str, run : dict) -> Any:
+    try:
+        a = step[arg]
+    except KeyError:
+        return None
+    argType, argValue = a["type"], a["value"]
     if argType == "runDictLookup":
         return getDVal(run, argValue)
     if argType == "const":
@@ -45,22 +49,22 @@ def getArgVal(arg : dict, run : dict) -> Any:
 
 def seqEx_getPixelRow_Absolute(step : dict, run : dict) -> None:
     args = ["image", "row", "lowLimit", "highLimit"]
-    [im, row, lowLimit, highLimit] = [getArgVal(step[arg], run) for arg in args]    
+    [im, row, lowLimit, highLimit] = [getArgVal(step, arg, run) for arg in args]    
     step["result"] = getPixelRow_Absolute(im, row, lowLimit, highLimit)
 
 def seqEx_getPixelColumn_Absolute(step : dict, run : dict) -> None:
     args = ["image", "column", "lowLimit", "highLimit"]
-    [im, column, lowLimit, highLimit] = [getArgVal(step[arg], run) for arg in args]    
+    [im, column, lowLimit, highLimit] = [getArgVal(step, arg, run) for arg in args]    
     step["result"] = getPixelColumn_Absolute(im, column, lowLimit, highLimit)
 
 def seqEx_getPixelRow_Percent(step : dict, run : dict) -> None:
     args = ["image", "row", "lowPercent", "highPercent"]
-    [im, row, lowPercent, highPercent] = [getArgVal(step[arg], run) for arg in args]    
+    [im, row, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
     step["result"] = getPixelRow_Percent(im, row, lowPercent, highPercent)
 
-def seqEx_getPixelColumn_Percent(step : dict, run : dict, coreFeatures : dict) -> None:
+def seqEx_getPixelColumn_Percent(step : dict, run : dict) -> None:
     args = ["image", "column", "lowPercent", "highPercent"]
-    [im, column, lowPercent, highPercent] = [getArgVal(step[arg], run, coreFeatures) for arg in args]    
+    [im, column, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
     step["result"] = getPixelColumn_Percent(im, column, lowPercent, highPercent)
 
 """
