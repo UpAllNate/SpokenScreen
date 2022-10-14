@@ -1,12 +1,16 @@
 from typing import Any
 try:
-    from common.ss_PixelScanners import *
+    from common.methods.ss_Pixel import *
 except:
-    from ss_PixelScanners import *
+    from methods.ss_Pixel import *
 try:
-    from common.ss_ColorClasses import ColorScanInstance
+    from common.methods.ss_Arithmetic import *
 except:
-    from ss_ColorClasses import ColorScanInstance
+    from methods.ss_Arithmetic import *
+
+"""
+These methods enable the functionality of 
+"""
 
 # Recursively dig through dictionary to retrieve value
 def getDVal(d : dict, listPath : list) -> Any:
@@ -41,12 +45,9 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
     if argType == "colors":
         return [run["colorInstances"][color] for color in argValue]
 
-#################################################
-#
-#       TOMLscript wrappers for python functions
-#
-#################################################
-
+"""
+These methods wrap the base python methods in a TOMLscript interpreter
+"""
 def seqEx_getPixelRow_Absolute(step : dict, run : dict) -> None:
     args = ["image", "row", "lowLimit", "highLimit"]
     [im, row, lowLimit, highLimit] = [getArgVal(step, arg, run) for arg in args]    
@@ -67,6 +68,11 @@ def seqEx_getPixelColumn_Percent(step : dict, run : dict) -> None:
     [im, column, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
     step["result"] = getPixelColumn_Percent(im, column, lowPercent, highPercent)
 
+def seqEx_flexAdd(step : dict, run : dict) -> None:
+   inputs = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "input"]
+   print(inputs)    
+   step["result"] = flexAdd(*inputs)
+
 """
 This dictionary is the link between the function text in a sequence step
 and the actual method called.
@@ -76,14 +82,14 @@ seqEx = {
     "getPixelColumn_Absolute" : seqEx_getPixelColumn_Absolute,
     "getPixelRow_Percent" : seqEx_getPixelRow_Percent,
     "getPixelColumn_Percent" : seqEx_getPixelColumn_Percent,
+    "flexAdd" : seqEx_flexAdd
 }
 
 """
 This function will accept any sequence dictionary and execute it.
 The bool return is whether the sequence completes all steps
-and the final step "result" resolves to True.
+and the final step "continue" resolves to True.
 """
-
 def executeTOMLsequence(seq : dict, run : dict) -> bool:
 
     stepIndexes = parseSeqStepIndexes(seq)
@@ -95,7 +101,7 @@ def executeTOMLsequence(seq : dict, run : dict) -> bool:
 
         seqEx[step["function"]](step, run)
 
-        if not getArgVal(step["result"]):
+        if not getArgVal(step["continue"]):
             return False
     
     return True
