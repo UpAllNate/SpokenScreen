@@ -9,7 +9,7 @@ import winsound
 from common.ss_Logging import logSS
 from common.ss_PathClasses import PathElement, PathType, SSPath, Path
 from common.ss_ColorClasses import *
-from common.ss_PixelScanners import *
+from common.methods.ss_Pixel import *
 from common.ss_ProfileClasses import findAllProfiles, AudioPackData, ProfileInstance
 from typing import Any
 import tomli
