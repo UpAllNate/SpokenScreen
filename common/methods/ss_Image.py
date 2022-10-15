@@ -1,3 +1,4 @@
+from fileinput import filename
 from PIL import Image, ImageGrab
 from PIL.Image import Image
 import numpy
@@ -55,3 +56,10 @@ def mergeImages_Vertical(*images : Image | list[Image]) -> Image:
 
     return returnImage
 
+def saveImage(im : Image, fileNombre : str) -> bool:
+    try:
+        im.save(fileNombre)
+    except:
+        return False
+    else:
+        return True

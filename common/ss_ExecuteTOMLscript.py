@@ -117,6 +117,11 @@ def seqEx_mergeImages_Vertical(step : dict, run : dict) -> None:
     images = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "image"]  
     step["result"] = mergeImages_Vertical(images)
 
+def seqEx_saveImage(step : dict, run : dict) -> None:
+    args = ["image", "fileName"]
+    [im, fileNombre] = [getArgVal(step, arg, run) for arg in args]    
+    step["result"] = saveImage(im, fileNombre)
+
 """
 This dictionary is the link between the function text in a sequence step
 and the actual method called.
@@ -133,7 +138,8 @@ seqEx = {
     "computeHash_DHash" : seqEx_computeHash_DHash,
     "makeNPArray" : seqEx_makeNPArray,
     "flexCropImage" : seqEx_flexCropImage,
-    "mergeImages_Vertical" : seqEx_mergeImages_Vertical
+    "mergeImages_Vertical" : seqEx_mergeImages_Vertical,
+    "saveImage" : seqEx_saveImage
 }
 
 """
