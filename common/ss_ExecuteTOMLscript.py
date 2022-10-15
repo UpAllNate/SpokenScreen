@@ -7,6 +7,14 @@ try:
     from common.methods.ss_Arithmetic import *
 except:
     from methods.ss_Arithmetic import *
+try:
+    from common.methods.ss_Hashing import *
+except:
+    from methods.ss_Hashing import *
+try:
+    from common.methods.ss_Image import *
+except:
+    from methods.ss_Image import *
 
 """
 These methods enable the functionality of 
@@ -88,6 +96,27 @@ def seqEx_flexDivide(step : dict, run : dict) -> None:
    print(inputs)    
    step["result"] = flexDivide(*inputs)
 
+def seqEx_computeHash_DHash(step : dict, run : dict) -> None:
+    args = ["image", "size"]
+    [im, size] = [getArgVal(step, arg, run) for arg in args]    
+    step["result"] = computeHash_DHash(im, size)
+
+def seqEx_screenshot(step : dict, run : dict) -> None:
+    step["result"] = screenshot()
+
+def seqEx_makeNPArray(step : dict, run : dict) -> None:
+    im = getArgVal(step, ["image"], run)
+    step["result"] = makeNPArray(im)
+
+def seqEx_flexCropImage(step : dict, run : dict) -> None:
+    args = ["image", "left", "top", "right", "bottom", "horizontalCount", "verticalCount"]
+    [im, left, top, right, bottom, horCount, vertCount] = [getArgVal(step, arg, run) for arg in args]    
+    step["result"] = flexCropImage(im, left, top, right, bottom, horCount, vertCount)
+
+def seqEx_mergeImages_Vertical(step : dict, run : dict) -> None:
+    images = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "image"]  
+    step["result"] = mergeImages_Vertical(images)
+
 """
 This dictionary is the link between the function text in a sequence step
 and the actual method called.
@@ -100,7 +129,11 @@ seqEx = {
     "flexAdd" : seqEx_flexAdd,
     "flexSubtract" : seqEx_flexSubtract,
     "flexMultiply" : seqEx_flexMultiply,
-    "flexDivide" : seqEx_flexDivide
+    "flexDivide" : seqEx_flexDivide,
+    "computeHash_DHash" : seqEx_computeHash_DHash,
+    "makeNPArray" : seqEx_makeNPArray,
+    "flexCropImage" : seqEx_flexCropImage,
+    "mergeImages_Vertical" : seqEx_mergeImages_Vertical
 }
 
 """
