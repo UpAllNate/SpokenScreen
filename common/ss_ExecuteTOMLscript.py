@@ -40,8 +40,6 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
         return getDVal(run, argValue)
     if argType == "const":
         return argValue
-    if argType == "core":
-        return run["coreFeatures"][argValue]
     if argType == "colors":
         return [run["colorInstances"][color] for color in argValue]
     if argType == "color":
