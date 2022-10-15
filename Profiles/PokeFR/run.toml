@@ -1,3 +1,4 @@
+
 name = "Pokemon FireRed"
 version = "1.0.0"
 
@@ -76,152 +77,94 @@ function = "chooseProfile"
 [sequence.tbBlue.1]
 function = "getPixelColumn_Percent"
 
-image.type = "core"
-image.value = "screenShot_Whole_npArray"
+image = ["core", "screenShot_Whole_npArray"]
+percent = ["const", 0.5] # Middle of screen
+percentLow = ["const", 0.5] # Lower half of screen
+percentHigh = ["const", 1.0] # To bottom of screen
 
-percent.type = "const"
-percent.value = 0.5 # Middle of screen
-percentLow.type = "const"
-percentLow.value = 0.5 # Lower half of screen
-percentHigh.type = "const"
-percentHigh.value = 1.0 # To bottom of screen
-
-continue.type = "const"
-continue.value = true
+continue = ["const", true]
 
 # Scan that pixel column for blue dialog box bounding frame colors
 [sequence.tbBlue.2]
 function = "pixelSequenceScan"
 
-pixels.type = "runDictLookup"
-pixels.value = ["sequence","tbBlue",1,"result"]
-colors = ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]
-continue.type = "runDictLookup"
-continue.value = ["sequence","tbBlue",2,"result",0]
+pixels = ["run", ["sequence","tbBlue",1,"result"]]
+colors = ["color", ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]]
+continue = ["run", ["sequence","tbBlue",2,"result",0]]
 
 [sequence.tbBlue.3]
 function = "getPixelRow_Pixel"
-image.type = "core"
-image.value = "screenShot_Whole_npArray"
-row.type = "runDictLookup"
+image = ["core", "screenShot_Whole_npArray"]
 
 # start pixel of Body color
 # result contains (resultBool (success or failure), list[colorscanInstance)]
 # result[1] points to the list[colorscanInstance)]
 # result[1][2] points to the third colorscanInstance (body)
 # result[1][2].startPixel points to the first pixel for detecting the textbox body
-row.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
-limitLowPercent = 0.0
-limitHighPercent = 1.0
-continue.type = true
+row = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
+limitLowPercent = ["const", 0.0]
+limitHighPercent = ["const", 1.0]
+continue = ["const", true]
 
 [sequence.tbBlue.4]
 function = "pixelSequenceScan"
-pixels.type = "runDictLookup"
-pixels.value = ["sequence","tbBlue",3,"result"]
+pixels = ["run", ["sequence","tbBlue",3,"result"]]
 arguements.colors = ["DialogueBlue_Outer_H", "DialogueBlue_Inner_H", "DialogueBlue_Body", "DialogueBlue_Inner_H", "DialogueBlue_Outer_H"]
-continue.type = "runDictLookup"
-continue.value = ["sequence","tbBlue",4,"result",0]
+continue = ["run", ["sequence","tbBlue",4,"result",0]]
 
 [sequence.tbBlue.5]
 function = "getValue_PercentBetweenValues"
-start.type = "runDictLookup"
-start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
-end.type = "runDictLookup"
-end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
-percent.type = "runDictLookup"
-percent.value = ["enum","DialogueLinePercents","BlueGrey","Line1_Start"]
+start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
+end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
+percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line1_Start"]]
 
 [sequence.tbBlue.6]
 function = "getValue_PercentBetweenValues"
-start.type = "runDictLookup"
-start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
-end.type = "runDictLookup"
-end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
-percent.type = "runDictLookup"
-percent.value = ["enum","DialogueLinePercents","BlueGrey","Line1_End"]
+start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
+end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
+percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line1_End"]]
 
 [sequence.tbBlue.7]
 function = "cropImage"
-image.type = "core"
-image.value = "screenShot_Whole_Image"
-topLeft.x.type = "runDictLookup"
-topLeft.x.value = ["sequence","tbBlue",4,"result",1,2,"startPixel"] # Horizontal body startPixel
-topLeft.y.type = "runDictLookup"
-topLeft.y.value = ["sequence","tbBlue",5,"result"] # Line1_Start percent between top and bottom body edge
-bottomRight.x.type = "runDictLookup"
-bottomRight.x.value = ["sequence","tbBlue",4,"result",1,2,"endPixel"] # Horizontal body endPixel
-bottomRight.y.type = "runDictLookup"
-bottomRight.y.value = ["sequence","tbBlue",6,"result"] # Line1_End percent between top and bottom body edge
-continue.type = true
+image = ["core", "screenShot_Whole_Image"]
+topLeft.x = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
+topLeft.y = ["run", ["sequence","tbBlue",5,"result"]] # Line1_Start percent between top and bottom body edge
+bottomRight.x = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
+bottomRight.y = ["run", ["sequence","tbBlue",6,"result"]] # Line1_End percent between top and bottom body edge
+continue = ["const", true]
 
 [sequence.tbBlue.8]
 function = "getValue_PercentBetweenValues"
-start.type = "runDictLookup"
-start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
-end.type = "runDictLookup"
-end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
-percent.type = "runDictLookup"
-percent.value = ["enum","DialogueLinePercents","BlueGrey","Line2_Start"]
+start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
+end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
+percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line2_Start"]]
 
 [sequence.tbBlue.9]
 function = "getValue_PercentBetweenValues"
-start.type = "runDictLookup"
-start.value = ["sequence","tbBlue",2,"result",1,2,"startPixel"]
-end.type = "runDictLookup"
-end.value = ["sequence","tbBlue",2,"result",1,2,"endPixel"]
-percent.type = "runDictLookup"
-percent.value = ["enum","DialogueLinePercents","BlueGrey","Line2_End"]
+start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
+end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
+percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line2_End"]]
 
 [sequence.tbBlue.10]
 function = "cropImage"
-image.type = "core"
-image.value = "screenShot_Whole_Image"
-topLeft.x.type = "runDictLookup"
-topLeft.x.value = ["sequence","tbBlue",4,"result",1,2,"startPixel"] # Horizontal body startPixel
-topLeft.y.type = "runDictLookup"
-topLeft.y.value = ["sequence","tbBlue",8,"result"] # Line2_Start percent between top and bottom body edge
-bottomRight.x.type = "runDictLookup"
-bottomRight.x.value = ["sequence","tbBlue",4,"result",1,2,"endPixel"] # Horizontal body endPixel
-bottomRight.y.type = "runDictLookup"
-bottomRight.y.value = ["sequence","tbBlue",9,"result"] # Line2_End percent between top and bottom body edge
-continue.type = true
+
+image = ["core", "screenShot_Whole_Image"]
+topLeft.x = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
+topLeft.y = ["run", ["sequence","tbBlue",8,"result"]] # Line2_Start percent between top and bottom body edge
+bottomRight.x = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
+bottomRight.y = ["run", ["sequence","tbBlue",9,"result"]] # Line2_End percent between top and bottom body edge
+
+continue = ["const", true]
 
 [sequence.tbBlue.11]
 function = "mergeImages_Vertical"
-imageTop.type = "runDictLookup"
-imageTop.value = ["sequence","tbBlue",7,"result"]
-imageBottom.type = "runDictLookup"
-imageBottom.value = ["sequence","tbBlue",10,"result"]
+
+imageTop = ["run", ["sequence","tbBlue",7,"result"]]
+imageBottom = ["run", ["sequence","tbBlue",10,"result"]]
+
+continue = ["const", true]
 
 [sequence.tbBlue.12]
 function = "saveImage"
-image.type = "runDictLookup"
-image.value = ["sequence","tbBlue",11,"result"]
-fileName = "test.png"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+image = ["run", ["sequence","tbBlue",11,"result"]]
+fileName = ["const", "test.png"]
