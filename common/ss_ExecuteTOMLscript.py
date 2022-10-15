@@ -36,7 +36,7 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
     except KeyError:
         return None
     argType, argValue = a["type"], a["value"]
-    if argType == "runDictLookup":
+    if argType == "run":
         return getDVal(run, argValue)
     if argType == "const":
         return argValue
