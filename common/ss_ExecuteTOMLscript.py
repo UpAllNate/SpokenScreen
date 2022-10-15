@@ -67,14 +67,14 @@ def seqEx_getPixelColumn_Absolute(step : dict, run : dict) -> None:
     step["result"] = getPixelColumn_Absolute(im, column, lowLimit, highLimit)
 
 def seqEx_getPixelRow_Percent(step : dict, run : dict) -> None:
-    args = ["image", "row", "lowPercent", "highPercent"]
-    [im, row, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
-    step["result"] = getPixelRow_Percent(im, row, lowPercent, highPercent)
+    args = ["image", "percent", "lowPercent", "highPercent"]
+    [im, percent, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
+    step["result"] = getPixelRow_Percent(im, percent, lowPercent, highPercent)
 
 def seqEx_getPixelColumn_Percent(step : dict, run : dict) -> None:
-    args = ["image", "column", "lowPercent", "highPercent"]
-    [im, column, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
-    step["result"] = getPixelColumn_Percent(im, column, lowPercent, highPercent)
+    args = ["image", "percent", "lowPercent", "highPercent"]
+    [im, percent, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
+    step["result"] = getPixelColumn_Percent(im, percent, lowPercent, highPercent)
 
 def seqEx_flexAdd(step : dict, run : dict) -> None:
    inputs = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "input"]
@@ -145,7 +145,7 @@ seqEx = {
 """
 This function will accept any sequence dictionary and execute it.
 The bool return is whether the sequence completes all steps
-and the final step "continue" resolves to True.
+and the final step "continue" does not resolve to false.
 """
 def executeTOMLsequence(seq : dict, run : dict) -> bool:
 
@@ -158,7 +158,9 @@ def executeTOMLsequence(seq : dict, run : dict) -> bool:
 
         seqEx[step["function"]](step, run)
 
-        if not getArgVal(step["continue"]):
+        continueVal = getArgVal(step["continue"])
+
+        if isinstance(continueVal,bool) and not continueVal:
             return False
     
     return True
