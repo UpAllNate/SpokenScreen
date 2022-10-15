@@ -75,6 +75,21 @@ def seqEx_flexAdd(step : dict, run : dict) -> None:
    print(inputs)    
    step["result"] = flexAdd(*inputs)
 
+def seqEx_flexSubtract(step : dict, run : dict) -> None:
+   inputs = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "input"]
+   print(inputs)    
+   step["result"] = flexSubtract(*inputs)
+
+def seqEx_flexMultiply(step : dict, run : dict) -> None:
+   inputs = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "input"]
+   print(inputs)    
+   step["result"] = flexMultiply(*inputs)
+
+def seqEx_flexDivide(step : dict, run : dict) -> None:
+   inputs = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "input"]
+   print(inputs)    
+   step["result"] = flexDivide(*inputs)
+
 """
 This dictionary is the link between the function text in a sequence step
 and the actual method called.
@@ -84,7 +99,10 @@ seqEx = {
     "getPixelColumn_Absolute" : seqEx_getPixelColumn_Absolute,
     "getPixelRow_Percent" : seqEx_getPixelRow_Percent,
     "getPixelColumn_Percent" : seqEx_getPixelColumn_Percent,
-    "flexAdd" : seqEx_flexAdd
+    "flexAdd" : seqEx_flexAdd,
+    "flexSubtract" : seqEx_flexSubtract,
+    "flexMultiply" : seqEx_flexMultiply,
+    "flexDivide" : seqEx_flexDivide
 }
 
 """
