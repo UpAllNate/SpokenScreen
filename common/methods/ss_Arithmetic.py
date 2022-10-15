@@ -1,6 +1,6 @@
 from typing import Any
 
-# Adds any number of strings, or any number of numbers, in lists, or not
+# Adds any number of arguments, in lists, or not
 def flexAdd(*args : Any) -> Any:
    sum = None
    for arg in args:
@@ -17,7 +17,7 @@ def flexAdd(*args : Any) -> Any:
             sum = a
    return sum
 
-# Subtracts any number of numbers, in lists, or not
+# Subtracts any number of arguments, in lists, or not
 def flexSubtract(*args : Any) -> Any:
    diff = None
    for arg in args:
@@ -34,7 +34,7 @@ def flexSubtract(*args : Any) -> Any:
             diff = a
    return diff
 
-# Multiplies any number of numbers, in lists, or not
+# Multiplies any number of arguments, in lists, or not
 def flexMultiply(*args : Any) -> Any:
    product = None
    for arg in args:
@@ -51,7 +51,7 @@ def flexMultiply(*args : Any) -> Any:
             product = a
    return product
 
-# Divides any number of numbers, in lists, or not
+# Divides any number of arguments, in lists, or not
 def flexDivide(*args : Any) -> Any:
    quotient = None
    for arg in args:
