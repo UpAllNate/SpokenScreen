@@ -71,6 +71,11 @@ function = "chooseProfile"
 
 [sequence]
 
+[sequence.start]
+
+[sequence.start.1]
+function = "screenshot"
+
 [sequence.tbBlue]
 
 # Get virtical pixel column in the middle of the screen
@@ -127,10 +132,10 @@ percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line1_End"]]
 [sequence.tbBlue.7]
 function = "cropImage"
 image = ["core", "screenShot_Whole_Image"]
-topLeft.x = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
-topLeft.y = ["run", ["sequence","tbBlue",5,"result"]] # Line1_Start percent between top and bottom body edge
-bottomRight.x = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
-bottomRight.y = ["run", ["sequence","tbBlue",6,"result"]] # Line1_End percent between top and bottom body edge
+left = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
+top = ["run", ["sequence","tbBlue",5,"result"]] # Line1_Start percent between top and bottom body edge
+right = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
+bottom = ["run", ["sequence","tbBlue",6,"result"]] # Line1_End percent between top and bottom body edge
 continue = ["const", true]
 
 [sequence.tbBlue.8]
