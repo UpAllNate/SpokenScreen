@@ -35,7 +35,7 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
         a = step[arg]
     except KeyError:
         return None
-    argType, argValue = a["type"], a["value"]
+    argType, argValue = a[0], a[1]
     if argType == "run":
         return getDVal(run, argValue)
     if argType == "const":
@@ -44,6 +44,8 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
         return run["coreFeatures"][argValue]
     if argType == "colors":
         return [run["colorInstances"][color] for color in argValue]
+    if argType == "color":
+        return run["colorInstances"][argValue]
 
 """
 These methods wrap the base python methods in a TOMLscript interpreter
