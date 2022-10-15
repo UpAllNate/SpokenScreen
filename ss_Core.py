@@ -70,7 +70,7 @@ if __name__ == "__main__":
         # Generate Core Features
         im = ImageGrab.grab()
         run["coreFeatures"]["screenShot_Whole_Image"] = im
-        run["coreFeatures"]["screenShot_Whole_npArray"] = numpy.array(im).tolist()
+        run["coreFeatures"]["screenShot_Whole_npArray"] = numpy.array(im)
 
         # Execute all sequences
         for seq in run["sequence"]:
