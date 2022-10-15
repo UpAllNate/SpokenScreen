@@ -2,14 +2,34 @@ from typing import Any
 
 # Adds any number of strings, or any number of numbers, in or not in lists
 def flexAdd(*args : Any) -> Any:
-   if isinstance(args[0], str) or (isinstance(args[0], list) and isinstance(args[0][0], str)):
-      sum = ""
-   else:
-      sum = 0
+   sum = None
    for arg in args:
       if isinstance(arg, list):
          for a in arg:
-            sum += a
+            if sum is not None:
+               sum += a
+            else:
+               sum = a
       else:
-         sum += arg
+         if sum is not None:
+            sum += a
+         else:
+            sum = a
    return sum
+
+# Subtracts any number of numbers, in or not in lists
+def flexSubtract(*args : Any) -> Any:
+   diff = None
+   for arg in args:
+      if isinstance(arg, list):
+         for a in arg:
+            if diff is not None:
+               diff -= a
+            else:
+               diff = a
+      else:
+         if diff is not None:
+            diff -= a
+         else:
+            diff = a
+   return diff
