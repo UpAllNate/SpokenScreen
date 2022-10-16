@@ -72,6 +72,56 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
     if argType == "color":
         return run["colorInstances"][argValue]
 
+def initRun(filename_Run) -> dict:
+    
+    with open(filename_Run, 'rb') as f:
+        run : dict = tomli.load(f)
+
+    # create colorInstances dict
+    run["colorInstances"] = {}
+
+    # fill colorInstances with objects
+    colors : dict = run["colors"]
+    for key in colors.keys():
+        (r, g, b) = colors[key]["color"]["r"], colors[key]["color"]["g"], colors[key]["color"]["b"]
+        purity = ColorPure.required if colors[key]["pureReq"] == True else ColorPure.notRequired
+        tolerance = colors[key]["tolerance"]
+
+        run["colorInstances"][key] = ColorScanInstance((r,g,b), tolerance, purity)
+
+    sequenceKeys : list(str) = run["sequence"].keys()
+
+    # verify all sequences have a hashList
+    for key in sequenceKeys:
+        seq = run["sequence"][key]
+        seq["hashIDList"] = []
+        seq["hashObjectList"] = []
+
+    # Check if the seq association is a valid
+    # run["sequence"] key. If so, put the
+    # hash definition values into the seq
+    # runtime lists
+    #
+    # Entries in run["hash"] are:
+    # {ID : (seqStr, hash, line text, character)}
+    hashCount = 0
+    for hashIDNumber in run["hash"]:
+        hashCount += 1
+
+        sequenceKey : str = run["hash"][hashIDNumber][0]
+        hashObject = imagehash.hex_to_hash(run["hash"][hashIDNumber][1])
+
+        if sequenceKey in sequenceKeys:
+            run["sequence"][sequenceKey]["hashIDList"].append(hashIDNumber)
+            run["sequence"][sequenceKey]["hashObjectList"].append(hashObject)
+        else:
+            logSS.critical(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
+            raise ValueError(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
+
+    run["hashCount"] = ["const", hashCount]
+
+    return run
+
 """
 These methods wrap the base python methods in a TOMLscript interpreter
 """
@@ -170,7 +220,7 @@ def seqEx_saveHash_IfNew(step : dict, run : dict) -> None:
 
     # update run hash database
     runHashes : dict = run["hash"]
-    runHashes[newHashID] = [seqStr, str(hash), "", ""]
+    runHashes[str(newHashID)] = [seqStr, str(hash), "", ""]
 
     # update seq hash lists
     seqHashIDList : list[int] = seqDict["hashIDList"]
@@ -180,9 +230,45 @@ def seqEx_saveHash_IfNew(step : dict, run : dict) -> None:
     step["result"] = True
     print("recorded new hash")
 
-    return
+def seqEx_updateRun(step : dict, run : dict) -> None:
 
+    exportRun = copy.deepcopy(run)
 
+    sequenceKeys : list(str) = exportRun["sequence"].keys()
+
+    # get rid of the sequence local hash lists
+    for key in sequenceKeys:
+        seq = exportRun["sequence"][key]
+        try:
+            seq.pop("hashIDList")
+        except:
+            pass
+        try:
+            seq.pop("hashObjectList")
+        except:
+            pass
+        for k in seq:
+            step = seq[k]
+            try:
+                step.pop("result")
+            except:
+                pass
+            try:
+                step.pop("prevHash")
+            except:
+                pass
+
+    
+    # get rid of the ColorScanInstance objects in run
+    try:
+        exportRun.pop("colorInstances")
+    except:
+        pass
+
+    with open(SSPath.runTOML.path, 'wb') as f:
+        tomli_w.dump(exportRun, f)
+    
+    step["result"] = True
 
 """
 This dictionary is the link between the function text in a sequence step
@@ -205,85 +291,9 @@ seqEx = {
     "screenshot" : seqEx_screenshot,
     "pixelSequenceScan" : seqEx_pixelSequenceScan,
     "computeHashFlatness" : seqEx_computHashFlatness,
-    "saveHash_IfNew" : seqEx_saveHash_IfNew
+    "saveHash_IfNew" : seqEx_saveHash_IfNew,
+    "updateRun" : seqEx_updateRun
 }
-
-def initRun(filename_Run) -> dict:
-    
-    with open(filename_Run, 'rb') as f:
-        run : dict = tomli.load(f)
-
-    # create colorInstances dict
-    run["colorInstances"] = {}
-
-    # fill colorInstances with objects
-    colors : dict = run["colors"]
-    for key in colors.keys():
-        (r, g, b) = colors[key]["color"]["r"], colors[key]["color"]["g"], colors[key]["color"]["b"]
-        purity = ColorPure.required if colors[key]["pureReq"] == True else ColorPure.notRequired
-        tolerance = colors[key]["tolerance"]
-
-        run["colorInstances"][key] = ColorScanInstance((r,g,b), tolerance, purity)
-
-    sequenceKeys : list(str) = run["sequence"].keys()
-
-    # verify all sequences have a hashList
-    for key in sequenceKeys:
-        seq = run["sequence"][key]
-        seq["hashIDList"] = []
-        seq["hashObjectList"] = []
-
-    # Check if the seq association is a valid
-    # run["sequence"] key. If so, put the
-    # hash definition values into the seq
-    # runtime lists
-    #
-    # Entries in run["hash"] are:
-    # {ID : (seqStr, hash, line text, character)}
-    hashCount = 0
-    for hashIDNumber in run["hash"]:
-        hashCount += 1
-
-        sequenceKey : str = run["hash"][hashIDNumber][0]
-        hashObject = imagehash.hex_to_hash(run["hash"][hashIDNumber][1])
-
-        if sequenceKey in sequenceKeys:
-            run["sequence"][sequenceKey]["hashIDList"].append(hashIDNumber)
-            run["sequence"][sequenceKey]["hashObjectList"].append(hashObject)
-        else:
-            logSS.critical(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
-            raise ValueError(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
-
-    run["hashCount"] = ["const", hashCount]
-
-    return run
-
-def updateRun(filename_Run, run : dict) -> None:
-
-    exportRun = copy.deepcopy(run)
-
-    sequenceKeys : list(str) = exportRun["sequence"].keys()
-
-    # get rid of the sequence local hash lists
-    for key in sequenceKeys:
-        seq = exportRun["sequence"][key]
-        try:
-            seq.pop("hashIDList")
-        except:
-            pass
-        try:
-            seq.pop("hashObjectList")
-        except:
-            pass
-    
-    # get rid of the ColorScanInstance objects in run
-    try:
-        exportRun.pop("colorInstances")
-    except:
-        pass
-
-    
-
 
 """
 This function will accept any sequence dictionary and execute it.

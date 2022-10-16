@@ -1,239 +1,260 @@
-
 name = "Pokemon FireRed"
 version = "1.0.0"
-
-[enum]
+hashCount = [ "const", 13, ]
 
 [enum.DialogueLinePercents.BlueGrey]
-Line1_Start =   0.1696428571
-Line1_End =     0.4151785714
-Line2_Start =   0.5848214286
-Line2_End =     0.8303571429
+Line1_Start = 0.1696428571
+Line1_End = 0.4151785714
+Line2_Start = 0.5848214286
+Line2_End = 0.8303571429
 
 [enum.DialogueLinePercents.Fight]
-Line1_Start =   0.1761904762
-Line1_End =     0.4380952381
-Line2_Start =   0.6523809524
-Line2_End =     0.9142857143
+Line1_Start = 0.1761904762
+Line1_End = 0.4380952381
+Line2_Start = 0.6523809524
+Line2_End = 0.9142857143
 
-[colors]
-
-# Dark blue
 [colors.DialogueBlue_Outer_V]
-color       = { r = 72, g = 112, b = 160 }
-tolerance   = 0
-pureReq     = true
+tolerance = 0
+pureReq = true
 
-# Light blue
+[colors.DialogueBlue_Outer_V.color]
+r = 72
+g = 112
+b = 160
+
 [colors.DialogueBlue_Inner_V]
-color       = { r = 160, g = 208, b = 224 }
-tolerance   = 0
-pureReq     = true
+tolerance = 0
+pureReq = true
 
-# Light blue (same as Inner_V)
+[colors.DialogueBlue_Inner_V.color]
+r = 160
+g = 208
+b = 224
+
 [colors.DialogueBlue_Outer_H]
-color       = { r = 160, g = 208, b = 224 }
-tolerance   = 0
-pureReq     = true
+tolerance = 0
+pureReq = true
 
-# Sort of grey color from the curve aliasing
+[colors.DialogueBlue_Outer_H.color]
+r = 160
+g = 208
+b = 224
+
 [colors.DialogueBlue_Inner_H]
-color       = { r = 208, g = 224, b = 240 }
-tolerance   = 0
-pureReq     = true
+tolerance = 0
+pureReq = true
+
+[colors.DialogueBlue_Inner_H.color]
+r = 208
+g = 224
+b = 240
 
 [colors.DialogueBlue_Body]
-color       = { r = 248, g = 248, b = 248 }
-tolerance   = 0
-pureReq     = false # Purity not required because of certainty of finding text pixels
+tolerance = 0
+pureReq = false
+
+[colors.DialogueBlue_Body.color]
+r = 248
+g = 248
+b = 248
 
 [colors.RedArrow_BlueGrey_Background]
-color       = { r = 248, g = 248, b = 248 }
-tolerance   = 0
-pureReq     = true
+tolerance = 0
+pureReq = true
+
+[colors.RedArrow_BlueGrey_Background.color]
+r = 248
+g = 248
+b = 248
 
 [colors.RedArrow_BlueGrey_Inner]
-color       = { r = 96, g = 96, b = 96 }
-tolerance   = 0
-pureReq     = true
+tolerance = 0
+pureReq = true
+
+[colors.RedArrow_BlueGrey_Inner.color]
+r = 96
+g = 96
+b = 96
 
 [colors.RedArrow_BlueGrey_Body]
-color       = { r = 224, g = 8, b = 8 }
-tolerance   = 0
-pureReq     = true
+tolerance = 0
+pureReq = true
 
-
-
-
-[initSequence]
+[colors.RedArrow_BlueGrey_Body.color]
+r = 224
+g = 8
+b = 8
 
 [initSequence.1]
 function = "chooseProfile"
-
-[sequence]
-
-[sequence.test]
 
 [sequence.test.1]
 function = "screenshot"
 
 [sequence.test.2]
 function = "makeNPArray"
-image = ["run", ["sequence", "test", "1", "result"]]
+image = [ "run", [ "sequence", "test", "1", "result", ], ]
 
 [sequence.test.3]
 function = "getPixelColumn_Percent"
-image = ["run", ["sequence", "test", "2", "result"]]
-percent = ["const", 0.5]
+image = [ "run", [ "sequence", "test", "2", "result", ], ]
+percent = [ "const", 0.5, ]
 
 [sequence.test.4]
 function = "pixelSequenceScan"
-pixels = ["run", ["sequence", "test", "3", "result"]]
-colors = ["colors", ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]]
-continue = ["run", ["sequence","test","4","result", 0]]
+pixels = [ "run", [ "sequence", "test", "3", "result", ], ]
+colors = [ "colors", [ "DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V", ], ]
+continue = [ "run", [ "sequence", "test", "4", "result", 0, ], ]
 
 [sequence.test.5]
 function = "getPixelRow_Absolute"
-image = ["run", ["sequence", "test", "2", "result"]]
-row = ["run", ["sequence", "test", "4", "result", 1, 2, "startPixel"]]
+image = [ "run", [ "sequence", "test", "2", "result", ], ]
+row = [ "run", [ "sequence", "test", "4", "result", 1, 2, "startPixel", ], ]
 
 [sequence.test.6]
 function = "pixelSequenceScan"
-pixels = ["run", ["sequence", "test", "5", "result"]]
-colors = ["colors", ["DialogueBlue_Outer_H", "DialogueBlue_Inner_H", "DialogueBlue_Body", "DialogueBlue_Inner_H", "DialogueBlue_Outer_H"]]
-continue = ["run", ["sequence","test","6","result", 0]]
+pixels = [ "run", [ "sequence", "test", "5", "result", ], ]
+colors = [ "colors", [ "DialogueBlue_Outer_H", "DialogueBlue_Inner_H", "DialogueBlue_Body", "DialogueBlue_Inner_H", "DialogueBlue_Outer_H", ], ]
+continue = [ "run", [ "sequence", "test", "6", "result", 0, ], ]
 
 [sequence.test.7]
 function = "flexCropImage"
-image = ["run", ["sequence", "test", "1", "result"]]
-left = ["run", ["sequence", "test", "6", "result", 1, 2, "startPixel"]]
-top = ["run", ["sequence", "test", "4", "result", 1, 2, "startPixel"]]
-right = ["run", ["sequence", "test", "6", "result", 1, 2, "endPixel"]]
-bottom = ["run", ["sequence", "test", "4", "result", 1, 2, "endPixel"]]
-horizontalCount = ["const", 3]
+image = [ "run", [ "sequence", "test", "1", "result", ], ]
+left = [ "run", [ "sequence", "test", "6", "result", 1, 2, "startPixel", ], ]
+top = [ "run", [ "sequence", "test", "4", "result", 1, 2, "startPixel", ], ]
+right = [ "run", [ "sequence", "test", "6", "result", 1, 2, "endPixel", ], ]
+bottom = [ "run", [ "sequence", "test", "4", "result", 1, 2, "endPixel", ], ]
+horizontalCount = [ "const", 3, ]
 
 [sequence.test.8]
 function = "mergeImages_Vertical"
-images = ["run", ["sequence", "test", "7", "result"]]
+images = [ "run", [ "sequence", "test", "7", "result", ], ]
 
 [sequence.test.9]
 function = "computeHash_DHash"
-image = ["run", ["sequence", "test", "8", "result"]]
-size = ["const", 36]
+image = [ "run", [ "sequence", "test", "8", "result", ], ]
+size = [ "const", 36, ]
 
 [sequence.test.10]
 function = "computeHashFlatness"
-hash = ["run", ["sequence", "test", "9", "result"]]
-differenceTolerance = ["const", 30]
-flatCountThreshold = ["const", 12]
-continue = ["run", ["sequence", "test", "10", "result"]]
+hash = [ "run", [ "sequence", "test", "9", "result", ], ]
+differenceTolerance = [ "const", 30, ]
+flatCountThreshold = [ "const", 12, ]
+continue = [ "run", [ "sequence", "test", "10", "result", ], ]
+currCount = [ "const", 12, ]
 
 [sequence.test.11]
 function = "saveHash_IfNew"
-hash = ["run", ["sequence", "test", "9", "result"]]
-seq = ["run", ["sequence", "test"]]
-seqStr = ["const", "test"]
-differenceTolerance = ["const", 30]
+hash = [ "run", [ "sequence", "test", "9", "result", ], ]
+seq = [ "run", [ "sequence", "test", ], ]
+seqStr = [ "const", "test", ]
+differenceTolerance = [ "const", 30, ]
+continue = [ "run", [ "sequence", "test", "11", "result", ], ]
+
+[sequence.test.12]
+function = "updateRun"
 
 [sequence.test.saveImage]
 function = "saveImage"
-image = ["run", ["sequence", "test", "8", "result"]]
-fileName = ["const", "testSave.png"]
+image = [ "run", [ "sequence", "test", "8", "result", ], ]
+fileName = [ "const", "testSave.png", ]
 
 [sequence.tbBlue]
 
-# Get virtical pixel column in the middle of the screen
 [sequence.tbBlue.1]
 function = "getPixelColumn_Percent"
+image = [ "core", "screenShot_Whole_npArray", ]
+percent = [ "const", 0.5, ]
+percentLow = [ "const", 0.5, ]
+percentHigh = [ "const", 1.0, ]
+continue = [ "const", true, ]
 
-image = ["core", "screenShot_Whole_npArray"]
-percent = ["const", 0.5] # Middle of screen
-percentLow = ["const", 0.5] # Lower half of screen
-percentHigh = ["const", 1.0] # To bottom of screen
-
-continue = ["const", true]
-
-# Scan that pixel column for blue dialog box bounding frame colors
 [sequence.tbBlue.2]
 function = "pixelSequenceScan"
-
-pixels = ["run", ["sequence","tbBlue",1,"result"]]
-colors = ["color", ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]]
-continue = ["run", ["sequence","tbBlue",2,"result",0]]
+pixels = [ "run", [ "sequence", "tbBlue", 1, "result", ], ]
+colors = [ "color", [ "DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V", ], ]
+continue = [ "run", [ "sequence", "tbBlue", 2, "result", 0, ], ]
 
 [sequence.tbBlue.3]
 function = "getPixelRow_Pixel"
-image = ["core", "screenShot_Whole_npArray"]
-
-# start pixel of Body color
-# result contains (resultBool (success or failure), list[colorscanInstance)]
-# result[1] points to the list[colorscanInstance)]
-# result[1][2] points to the third colorscanInstance (body)
-# result[1][2].startPixel points to the first pixel for detecting the textbox body
-row = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
-limitLowPercent = ["const", 0.0]
-limitHighPercent = ["const", 1.0]
+image = [ "core", "screenShot_Whole_npArray", ]
+row = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "startPixel", ], ]
+limitLowPercent = [ "const", 0.0, ]
+limitHighPercent = [ "const", 1.0, ]
 
 [sequence.tbBlue.4]
 function = "pixelSequenceScan"
-pixels = ["run", ["sequence","tbBlue",3,"result"]]
-arguements.colors = ["DialogueBlue_Outer_H", "DialogueBlue_Inner_H", "DialogueBlue_Body", "DialogueBlue_Inner_H", "DialogueBlue_Outer_H"]
-continue = ["run", ["sequence","tbBlue",4,"result",0]]
+pixels = [ "run", [ "sequence", "tbBlue", 3, "result", ], ]
+continue = [ "run", [ "sequence", "tbBlue", 4, "result", 0, ], ]
+
+[sequence.tbBlue.4.arguements]
+colors = [ "DialogueBlue_Outer_H", "DialogueBlue_Inner_H", "DialogueBlue_Body", "DialogueBlue_Inner_H", "DialogueBlue_Outer_H", ]
 
 [sequence.tbBlue.5]
 function = "getValue_PercentBetweenValues"
-start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
-end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
-percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line1_Start"]]
+start = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "startPixel", ], ]
+end = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "endPixel", ], ]
+percent = [ "run", [ "enum", "DialogueLinePercents", "BlueGrey", "Line1_Start", ], ]
 
 [sequence.tbBlue.6]
 function = "getValue_PercentBetweenValues"
-start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
-end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
-percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line1_End"]]
+start = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "startPixel", ], ]
+end = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "endPixel", ], ]
+percent = [ "run", [ "enum", "DialogueLinePercents", "BlueGrey", "Line1_End", ], ]
 
 [sequence.tbBlue.7]
 function = "cropImage"
-image = ["core", "screenShot_Whole_Image"]
-left = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
-top = ["run", ["sequence","tbBlue",5,"result"]] # Line1_Start percent between top and bottom body edge
-right = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
-bottom = ["run", ["sequence","tbBlue",6,"result"]] # Line1_End percent between top and bottom body edge
-continue = ["const", true]
+image = [ "core", "screenShot_Whole_Image", ]
+left = [ "run", [ "sequence", "tbBlue", 4, "result", 1, 2, "startPixel", ], ]
+top = [ "run", [ "sequence", "tbBlue", 5, "result", ], ]
+right = [ "run", [ "sequence", "tbBlue", 4, "result", 1, 2, "endPixel", ], ]
+bottom = [ "run", [ "sequence", "tbBlue", 6, "result", ], ]
+continue = [ "const", true, ]
 
 [sequence.tbBlue.8]
 function = "getValue_PercentBetweenValues"
-start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
-end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
-percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line2_Start"]]
+start = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "startPixel", ], ]
+end = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "endPixel", ], ]
+percent = [ "run", [ "enum", "DialogueLinePercents", "BlueGrey", "Line2_Start", ], ]
 
 [sequence.tbBlue.9]
 function = "getValue_PercentBetweenValues"
-start = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
-end = ["run", ["sequence","tbBlue",2,"result",1,2,"endPixel"]]
-percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line2_End"]]
+start = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "startPixel", ], ]
+end = [ "run", [ "sequence", "tbBlue", 2, "result", 1, 2, "endPixel", ], ]
+percent = [ "run", [ "enum", "DialogueLinePercents", "BlueGrey", "Line2_End", ], ]
 
 [sequence.tbBlue.10]
 function = "cropImage"
-
-image = ["core", "screenShot_Whole_Image"]
-left = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
-top = ["run", ["sequence","tbBlue",8,"result"]] # Line2_Start percent between top and bottom body edge
-right = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
-bottom = ["run", ["sequence","tbBlue",9,"result"]] # Line2_End percent between top and bottom body edge
-
-continue = ["const", true]
+image = [ "core", "screenShot_Whole_Image", ]
+left = [ "run", [ "sequence", "tbBlue", 4, "result", 1, 2, "startPixel", ], ]
+top = [ "run", [ "sequence", "tbBlue", 8, "result", ], ]
+right = [ "run", [ "sequence", "tbBlue", 4, "result", 1, 2, "endPixel", ], ]
+bottom = [ "run", [ "sequence", "tbBlue", 9, "result", ], ]
+continue = [ "const", true, ]
 
 [sequence.tbBlue.11]
 function = "mergeImages_Vertical"
-
-imageTop = ["run", ["sequence","tbBlue",7,"result"]]
-imageBottom = ["run", ["sequence","tbBlue",10,"result"]]
-
-continue = ["const", true]
+imageTop = [ "run", [ "sequence", "tbBlue", 7, "result", ], ]
+imageBottom = [ "run", [ "sequence", "tbBlue", 10, "result", ], ]
+continue = [ "const", true, ]
 
 [sequence.tbBlue.12]
 function = "saveImage"
-image = ["run", ["sequence","tbBlue",11,"result"]]
-fileName = ["const", "test.png"]
+image = [ "run", [ "sequence", "tbBlue", 11, "result", ], ]
+fileName = [ "const", "test.png", ]
+
 [hash]
+0 = [ "test", "089401206b268329315d964924951a78671551e7963156c945924a3302a90a59b7336c1ada72c8f3c7662a261678a9270dbc24098124099225632c265829455259a534953556aba9536569a29649a5593799348a3499149a44b8d111c9534931d66b275268b6850251129480d0e4c32002b0b34c00553274a005573b4340d536b4580cb8e22a80347150000f00000000c00000000800000000400000000800000000", "", "", ]
+1 = [ "test", "480048821b10db2646ac924d93952a5918f94dc4ddac5ad70dca1a4add77324b3b59635a93359694aca1d5695a2c524a54511209402224908440693615b2186998a4ca4b91a8d48e399a6f1826c9c043a6c25330c186eb0f41861cecc00004cae20000a394c0000144000000d9200820024d12080059169b7005b155ab4049345a3402d2aad50012c140a00000000000000000000000000000000000000000000000", "", "", ]
+2 = [ "test", "8844c1208723b0c922ecb4d36095686f330a4686d13166c526d225900882c0a000000000000000000000000000000000000000000000281021249d06316cb4ecbce934bcf18aa46bcf185996da8a0d9354505106ca2000001300000000000000000000000000000000200000124400000e89100000d28f40000a74600000ace500000925a00000288000000000000000000000000000000000000000000000000000", "", "", ]
+3 = [ "test", "88341923572c96494aad3697692b72b1639546a35430d6d164f2689269b258cac9a9a56992bc3b56b35e43b5296d1288ab892812214162236463295949b18db5e93499ab5793499ab571b54da52449d66f800320990e00000000f800000005a0000000a8000000000000000040a6090c0b34926b00b4b3594c0b06b5b6e0b14b492e055b22d560220812880000000000000000000000000000000000000000000000", "", "", ]
+4 = [ "test", "492904524b13219ad0ad2d2652f52d9a99af4dd9ad9a42d2d2e5904cc3343261e309369a92bcab55a9dbd6b45a2d5ad92a512a026140949800000092200000ce9c00000895b00000895b4249086cd199232412264dcdba5e4b372bc1e59332bc4e5ad5d9a952ada361605525000000000000000000000000000000000000400000000800000000500000000500000000500000000500000000400000000000000000", "", "", ]
+5 = [ "test", "41201101a26c340b64313498797b5395a6954db1587944a34b9babb53246c55ad2d2939552d9ad1b44dd9acb15ad6d125531282812a049a3000001658a0000c864a00002a44a0000d8d680000d9b2c9040e64924992352ed92692c491a875a46923835d1a6b312a28414c815000002000000000000000000000000000000000900000443200000998da0000696da000058ada0000792da000025508000090a800000", "", "", ]
+6 = [ "test", "866d158205892ea4d9d93552d249b2555a6a596555a6a44acb2925b24c512cb5d2d8993452b3c96b452b1876b4ad52b4d1212200a2a01088219204b64966d3b66a69724b894716309ab2b5430954b42bab487493060768c64d6c479479d5f57b33b14bb44aa48b508051a040128000000491000000b6c000000ccf800000b55a0000036a8000005900000007a0000000740000000680000000900000000400000000", "", "", ]
+7 = [ "test", "088008904b211924cb5daa4993451e8b231d51989b9588c1b5b9246362650d1696db44c4cd687c6b4cd695d2946285a2a4a904a40529203248a90d14cb056e1a9b4e5b354525e5921c525a56aaea96d36d53948009264f00000064bc0000052ad000009b54000002488240001b21c8000a45c360008c826e00086a4e70008694e7000a45a340000825c8000000000000000000000000000000000000000000000000", "", "", ]
+8 = [ "test", "488011000b622ac400a9c1538004da91b4004db85b6802324c4192b349b326c4be9254d34cd38d4a76cf3934a6a52c322d148004d028000000000000000000000000000000001000000026000082689a08609939867994d23e962e5da66952e59a6694d56ca494a2890180110000000000000000000000000000000000000004c00008498000006b24c000074e1c000064d980000669440000964980000298000000", "", "", ]
+9 = [ "test", "484401016b13946809acb31952cb29396d2cad930d32c8d568d29512086240000000c000000000000000000000000000000000000000104812484a1904d303da6cb24d29a57244f29a4f34af2502892288a0504c500000000000000000000000000000000000000480000000a400000001800000005a0000000b40000000b40000000100000000000000000000000000000000000000000000000000000000000000", "", "", ]
+10 = [ "test", "b12c0a9104cd11364caa6e164aca8eda75aca98da726c83d19864cf44e54a505daf2b250526e24a50524e8d250ad3a9b440028464a00000018000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "", "", ]
+11 = [ "test", "b104825884ec904865ad268b65aa954d3656c914d3b590dae894d10251063240000000c100000000000000000000000000000000240001009c8002a2d236001592d260092549ad8005bc9ada04da1d56803242201000c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "", "", ]
+12 = [ "test", "889028ca072499235ae9926dada9198b2ada4898a6a5a6c934d4889160b280000000c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "", "", ]
