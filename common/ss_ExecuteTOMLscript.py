@@ -146,6 +146,11 @@ def seqEx_pixelSequenceScan(step : dict, run : dict) -> None:
     [pixels, colors] = [getArgVal(step, arg, run) for arg in args]
     step["result"] = pixelSequenceScan(pixels, colors)
 
+def seqEx_computHashFlatness(step : dict, run : dict) -> None:
+    args = ["hash", "differenceTolerance", "flatCountThreshold", "prevHash", "currCount"]
+    [hash, diffTol, countThresh, prevHash, currCount] = [getArgVal(step, arg, run) for arg in args]
+    step["result"], step["prevHash"], step["currCount"] = computeHashFlatness(hash, prevHash, diffTol, countThresh, currCount)
+
 """
 This dictionary is the link between the function text in a sequence step
 and the actual method called.
@@ -165,11 +170,14 @@ seqEx = {
     "mergeImages_Vertical" : seqEx_mergeImages_Vertical,
     "saveImage" : seqEx_saveImage,
     "screenshot" : seqEx_screenshot,
-    "pixelSequenceScan" : seqEx_pixelSequenceScan
+    "pixelSequenceScan" : seqEx_pixelSequenceScan,
+    "computeHashFlatness" : seqEx_computHashFlatness
 }
 
 def initRun(filename_Run) -> dict:
-    run : dict = tomli.load(open(filename_Run, 'rb'))
+    
+    with open(filename_Run, 'rb') as f:
+        run : dict = tomli.load(f)
 
     # create colorInstances dict
     run["colorInstances"] = {}

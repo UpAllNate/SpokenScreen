@@ -119,9 +119,13 @@ images = ["run", ["sequence", "test", "7", "result"]]
 [sequence.test.9]
 function = "computeHash_DHash"
 image = ["run", ["sequence", "test", "8", "result"]]
-size = 36
+size = ["const", 36]
 
-
+[sequence.test.10]
+function = "computeHashFlatness"
+hash = ["run", ["sequence", "test", "9", "result"]]
+differenceTolerance = ["const", 20]
+flatCountThreshold = ["const", 8]
 
 [sequence.test.saveImage]
 function = "saveImage"
