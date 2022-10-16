@@ -62,7 +62,8 @@ color       = { r = 224, g = 8, b = 8 }
 tolerance   = 0
 pureReq     = true
 
-[hash]
+
+
 
 [initSequence]
 
@@ -71,10 +72,61 @@ function = "chooseProfile"
 
 [sequence]
 
-[sequence.start]
+[sequence.test]
 
-[sequence.start.1]
+[sequence.test.1]
 function = "screenshot"
+
+[sequence.test.2]
+function = "makeNPArray"
+image = ["run", ["sequence", "test", "1", "result"]]
+
+[sequence.test.3]
+function = "getPixelColumn_Percent"
+image = ["run", ["sequence", "test", "2", "result"]]
+percent = ["const", 0.5]
+
+[sequence.test.4]
+function = "pixelSequenceScan"
+pixels = ["run", ["sequence", "test", "3", "result"]]
+colors = ["colors", ["DialogueBlue_Outer_V", "DialogueBlue_Inner_V", "DialogueBlue_Body", "DialogueBlue_Inner_V", "DialogueBlue_Outer_V"]]
+continue = ["run", ["sequence","test","4","result", 0]]
+
+[sequence.test.5]
+function = "getPixelRow_Absolute"
+image = ["run", ["sequence", "test", "2", "result"]]
+row = ["run", ["sequence", "test", "4", "result", 1, 2, "startPixel"]]
+
+[sequence.test.6]
+function = "pixelSequenceScan"
+pixels = ["run", ["sequence", "test", "5", "result"]]
+colors = ["colors", ["DialogueBlue_Outer_H", "DialogueBlue_Inner_H", "DialogueBlue_Body", "DialogueBlue_Inner_H", "DialogueBlue_Outer_H"]]
+continue = ["run", ["sequence","test","6","result", 0]]
+
+[sequence.test.7]
+function = "flexCropImage"
+image = ["run", ["sequence", "test", "1", "result"]]
+left = ["run", ["sequence", "test", "6", "result", 1, 2, "startPixel"]]
+top = ["run", ["sequence", "test", "4", "result", 1, 2, "startPixel"]]
+right = ["run", ["sequence", "test", "6", "result", 1, 2, "endPixel"]]
+bottom = ["run", ["sequence", "test", "4", "result", 1, 2, "endPixel"]]
+horizontalCount = ["const", 3]
+
+[sequence.test.8]
+function = "mergeImages_Vertical"
+images = ["run", ["sequence", "test", "7", "result"]]
+
+[sequence.test.9]
+function = "computeHash_DHash"
+image = ["run", ["sequence", "test", "8", "result"]]
+size = 36
+
+
+
+[sequence.test.saveImage]
+function = "saveImage"
+image = ["run", ["sequence", "test", "8", "result"]]
+fileName = ["const", "testSave.png"]
 
 [sequence.tbBlue]
 
@@ -109,7 +161,6 @@ image = ["core", "screenShot_Whole_npArray"]
 row = ["run", ["sequence","tbBlue",2,"result",1,2,"startPixel"]]
 limitLowPercent = ["const", 0.0]
 limitHighPercent = ["const", 1.0]
-continue = ["const", true]
 
 [sequence.tbBlue.4]
 function = "pixelSequenceScan"
@@ -154,10 +205,10 @@ percent = ["run", ["enum","DialogueLinePercents","BlueGrey","Line2_End"]]
 function = "cropImage"
 
 image = ["core", "screenShot_Whole_Image"]
-topLeft.x = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
-topLeft.y = ["run", ["sequence","tbBlue",8,"result"]] # Line2_Start percent between top and bottom body edge
-bottomRight.x = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
-bottomRight.y = ["run", ["sequence","tbBlue",9,"result"]] # Line2_End percent between top and bottom body edge
+left = ["run", ["sequence","tbBlue",4,"result",1,2,"startPixel"]] # Horizontal body startPixel
+top = ["run", ["sequence","tbBlue",8,"result"]] # Line2_Start percent between top and bottom body edge
+right = ["run", ["sequence","tbBlue",4,"result",1,2,"endPixel"]] # Horizontal body endPixel
+bottom = ["run", ["sequence","tbBlue",9,"result"]] # Line2_End percent between top and bottom body edge
 
 continue = ["const", true]
 
@@ -173,3 +224,4 @@ continue = ["const", true]
 function = "saveImage"
 image = ["run", ["sequence","tbBlue",11,"result"]]
 fileName = ["const", "test.png"]
+[hash]
