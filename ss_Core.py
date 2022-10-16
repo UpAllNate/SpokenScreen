@@ -14,7 +14,22 @@ from common.ss_ProfileClasses import findAllProfiles, AudioPackData, ProfileInst
 from typing import Any
 import tomli
 import time
-from common.ss_ExecuteTOMLscript import executeTOMLsequence
+from common.ss_ExecuteTOMLscript import executeTOMLsequence, initRun
+
+SSPath.runTOML.path = os.path.join(SSPath.dir.path, "Profiles\\PokeFR\\run.toml")
+SSPath.runTOML.detect()
+
+run = initRun(SSPath.runTOML.path)
+
+# screenShot = ImageGrab.grab()
+# screenShot.save('ss.png')
+# ssArr = numpy.array(screenShot)
+# midCol = getPixelColumn_Percent(ssArr, 0.5)
+
+print( executeTOMLsequence(run["sequence"]["test"], run) )
+
+
+exit()
 
 # Returns valid selection
 def chooseFromList(prompt : str, l : list) -> int:
@@ -63,7 +78,7 @@ if __name__ == "__main__":
     SSPath.runTOML.path = os.path.join(SSPath.selectedProfile.path, "run.toml")
     SSPath.runTOML.detect()
 
-    run = tomli.load(open(SSPath.runTOML.path, 'rb'))
+    
 
     while True:
 
@@ -73,5 +88,7 @@ if __name__ == "__main__":
         run["coreFeatures"]["screenShot_Whole_npArray"] = numpy.array(im)
 
         # Execute all sequences
-        for seq in run["sequence"]:
-            executeTOMLsequence(seq, run)
+        for i in run:
+
+            for seq in run["sequence"]:
+                executeTOMLsequence(seq, run)
