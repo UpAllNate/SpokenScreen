@@ -153,6 +153,37 @@ def seqEx_computHashFlatness(step : dict, run : dict) -> None:
     step["prevHash"] = ["const", prevHash]
     step["currCount"] = ["const", currCount]
 
+def seqEx_saveHash_IfNew(step : dict, run : dict) -> None:
+    args = ["hash", "seq", "seqStr", "differenceTolerance"]
+    [hash, seqDict, seqStr, diffTol] = [getArgVal(step, arg, run) for arg in args]
+
+    seqHashObjectList : list[imagehash.ImageHash] = seqDict["hashObjectList"]
+
+    for i, seqHash in enumerate(seqHashObjectList):
+        if hash - seqHash <= diffTol:
+            step["result"] = False
+            return
+    
+    # hash is a new find!
+    newHashID : int = run["hashCount"][1]
+    run["hashCount"][1] += 1
+
+    # update run hash database
+    runHashes : dict = run["hash"]
+    runHashes[newHashID] = [seqStr, str(hash), "", ""]
+
+    # update seq hash lists
+    seqHashIDList : list[int] = seqDict["hashIDList"]
+    seqHashIDList.append(newHashID)
+    seqHashObjectList.append(hash)
+
+    step["result"] = True
+    print("recorded new hash")
+
+    return
+
+
+
 """
 This dictionary is the link between the function text in a sequence step
 and the actual method called.
@@ -173,7 +204,8 @@ seqEx = {
     "saveImage" : seqEx_saveImage,
     "screenshot" : seqEx_screenshot,
     "pixelSequenceScan" : seqEx_pixelSequenceScan,
-    "computeHashFlatness" : seqEx_computHashFlatness
+    "computeHashFlatness" : seqEx_computHashFlatness,
+    "saveHash_IfNew" : seqEx_saveHash_IfNew
 }
 
 def initRun(filename_Run) -> dict:
@@ -208,15 +240,21 @@ def initRun(filename_Run) -> dict:
     #
     # Entries in run["hash"] are:
     # {ID : (seqStr, hash, line text, character)}
+    hashCount = 0
     for hashIDNumber in run["hash"]:
+        hashCount += 1
+
         sequenceKey : str = run["hash"][hashIDNumber][0]
         hashObject = imagehash.hex_to_hash(run["hash"][hashIDNumber][1])
+
         if sequenceKey in sequenceKeys:
             run["sequence"][sequenceKey]["hashIDList"].append(hashIDNumber)
             run["sequence"][sequenceKey]["hashObjectList"].append(hashObject)
         else:
             logSS.critical(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
             raise ValueError(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
+
+    run["hashCount"] = ["const", hashCount]
 
     return run
 
