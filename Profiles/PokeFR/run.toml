@@ -124,8 +124,9 @@ size = ["const", 36]
 [sequence.test.10]
 function = "computeHashFlatness"
 hash = ["run", ["sequence", "test", "9", "result"]]
-differenceTolerance = ["const", 20]
+differenceTolerance = ["const", 5]
 flatCountThreshold = ["const", 8]
+continue = ["run", ["sequence", "test", "10", "result"]]
 
 [sequence.test.saveImage]
 function = "saveImage"

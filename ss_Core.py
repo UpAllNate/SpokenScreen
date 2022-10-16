@@ -26,7 +26,8 @@ run = initRun(SSPath.runTOML.path)
 # ssArr = numpy.array(screenShot)
 # midCol = getPixelColumn_Percent(ssArr, 0.5)
 
-print( executeTOMLsequence(run["sequence"]["test"], run) )
+while True:
+    executeTOMLsequence(run["sequence"]["test"], run)
 
 
 exit()

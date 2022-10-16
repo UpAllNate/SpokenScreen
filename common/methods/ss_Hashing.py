@@ -13,13 +13,14 @@ def computeHashFlatness(
                         diffTol : int, 
                         countThresh : int, 
                         currentCount : int
-                        ) -> tuple(bool, imagehash.ImageHash, int):
+                        ) -> tuple[bool, imagehash.ImageHash, int]:
     
     # Initialize if there is no previous hash
     if prevHash is None:
         prevHash = hash
         currentCount = 0
-        flat = True
+        flat = False
+        diff = 0
     else:
         
         # this uses the imagehash "hamming window" to find
@@ -33,4 +34,5 @@ def computeHashFlatness(
 
         flat = True if currentCount >= countThresh else False
 
+    print(f"count: {currentCount}, diff: {diff}, flat: {flat}")
     return flat, hash, currentCount

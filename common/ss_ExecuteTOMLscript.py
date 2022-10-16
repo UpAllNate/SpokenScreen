@@ -149,7 +149,9 @@ def seqEx_pixelSequenceScan(step : dict, run : dict) -> None:
 def seqEx_computHashFlatness(step : dict, run : dict) -> None:
     args = ["hash", "differenceTolerance", "flatCountThreshold", "prevHash", "currCount"]
     [hash, diffTol, countThresh, prevHash, currCount] = [getArgVal(step, arg, run) for arg in args]
-    step["result"], step["prevHash"], step["currCount"] = computeHashFlatness(hash, prevHash, diffTol, countThresh, currCount)
+    step["result"], prevHash, currCount = computeHashFlatness(hash, prevHash, diffTol, countThresh, currCount)
+    step["prevHash"] = ["const", prevHash]
+    step["currCount"] = ["const", currCount]
 
 """
 This dictionary is the link between the function text in a sequence step
@@ -258,7 +260,7 @@ def executeTOMLsequence(seq : dict, run : dict) -> bool:
         step = seq[stepIndex]
 
         funName = step["function"]
-        print(f"Step {stepIndex}: {funName}")
+        #print(f"Step {stepIndex}: {funName}")
         seqEx[step["function"]](step, run)
 
         continueVal = getArgVal(step, "continue", run)
