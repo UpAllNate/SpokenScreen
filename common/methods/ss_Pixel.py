@@ -14,22 +14,26 @@ except:
     from ss_ColorMethods import clearColorScanPixels, colorWithinTolerance
 
 from PIL.Image import Image as ImageClass
+import numpy
+import copy
 
-def getPixelRow_Absolute(im : list[list[tuple[int,int,int,int]]], row : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> list[list[int,int,int]]:
+def getPixelRow_Absolute(im : numpy.ndarray, row : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> numpy.ndarray:
     numberOfRows = len(im)
-
-    if limitPixel_Low is None: limitPixel_Low = 0
-    if limitPixel_High is None: limitPixel_High = numberOfRows + 1
-
-    return im[row][limitPixel_Low:limitPixel_High]
-
-def getPixelColumn_Absolute(im : list[list[tuple[int,int,int,int]]], column : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> list[list[int,int,int]]:
-    numberOfColumns = len(im[0]) # How many columns
+    numberOfColumns = len(im[0])
 
     if limitPixel_Low is None: limitPixel_Low = 0
     if limitPixel_High is None: limitPixel_High = numberOfColumns + 1
 
-    return [(row[column][0:3]) for row in im[limitPixel_Low:limitPixel_High]]
+    return im[row][limitPixel_Low:limitPixel_High]
+
+def getPixelColumn_Absolute(im : list[list[tuple[int,int,int,int]]], column : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> list[list[int,int,int]]:
+    numberOfRows = len(im)
+    numberOfColumns = len(im[0])
+
+    if limitPixel_Low is None: limitPixel_Low = 0
+    if limitPixel_High is None: limitPixel_High = numberOfRows + 1
+
+    return [row[column][:3] for row in im[limitPixel_Low:limitPixel_High]]
 
 def getPercentOfRange(low, high, percent : float):
     len = high - low
@@ -42,29 +46,30 @@ def getPercentOfRange(low, high, percent : float):
 
 def getPixelRow_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, limitPercent_Low : float = None, limitPercent_High : float = None) -> list[list[int,int,int]]:
     numberOfRows = len(im)
-    upperLimit = numberOfRows + 1
+    numberOfColumns = len(im[0])
 
     if limitPercent_Low is None: limitPercent_Low = 0.0
     if limitPercent_High is None: limitPercent_High = 1.0
 
-    row = int(getPercentOfRange(0, upperLimit, percent))
-    limitPixel_Low = int(getPercentOfRange(0, upperLimit, limitPercent_Low))
-    limitPixel_High = int(getPercentOfRange(0, upperLimit, limitPercent_High))
+    row = int(getPercentOfRange(0, numberOfRows, percent))
+    limitPixel_Low = int(getPercentOfRange(0, numberOfColumns, limitPercent_Low))
+    limitPixel_High = int(getPercentOfRange(0, numberOfColumns, limitPercent_High))
 
     return im[row][limitPixel_Low:limitPixel_High]
 
 def getPixelColumn_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, limitPercent_Low : float = None, limitPercent_High : float = None) -> list[list[int,int,int]]:
+    numberOfRows = len(im)
     numberOfColumns = len(im[0])
-    upperLimit = numberOfColumns + 1
 
     if limitPercent_Low is None: limitPercent_Low = 0.0
     if limitPercent_High is None: limitPercent_High = 1.0
 
-    column = int(getPercentOfRange(0, upperLimit, percent))
-    limitPixel_Low = int(getPercentOfRange(0, upperLimit, limitPercent_Low))
-    limitPixel_High = int(getPercentOfRange(0, upperLimit, limitPercent_High))
+    column = int(getPercentOfRange(0, numberOfColumns + 1, percent))
+    print(f"column: {column}")
+    limitPixel_Low = int(getPercentOfRange(0, numberOfRows, limitPercent_Low))
+    limitPixel_High = int(getPercentOfRange(0, numberOfRows, limitPercent_High))
 
-    return [(row[column][0:3]) for row in im[limitPixel_Low:limitPixel_High]]
+    return [row[column] for row in im[limitPixel_Low:limitPixel_High]]
 
 # Returns detection result as bool and ColorScanInstance
 # of single instance or equal list length
@@ -84,7 +89,7 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
         singleColorInstance = False
 
     if not isinstance(colors[0],ColorScanInstance):
-        logSS.critical(f"pixelSequenceScan received colors input of invalid type: {colors[0].__class__.__name__}")
+        # logSS.critical(f"pixelSequenceScan received colors input of invalid type: {colors[0].__class__.__name__}")
         raise TypeError(f"pixelSequenceScan received colors input of invalid type: {colors[0].__class__.__name__}")
 
     ####################################################
@@ -106,6 +111,7 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
             # Only for colors[0], set start on initial detection
             if colors[cIndex].startPixel is None:
                 colors[cIndex].startPixel = px
+                # logSS.debug(f"First color: {colors[cIndex]}, starts here")
             
             # Get the current pixel every time it matches
             colors[cIndex].endPixel = px
@@ -119,15 +125,15 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
 
         # If this pixel doesn't match the current scan color...
         elif colors[cIndex].startPixel is not None:
-            logSS.debug(f"Pixel {px} color: {pxColor} doesn't match current: {colors[cIndex]}")
+            # logSS.debug(f"Pixel {px} color: {pxColor} doesn't match current: {colors[cIndex]}")
 
             # Check if there is a next color
             if cIndex != len(colors) - 1:
-                logSS.debug(f"Index {cIndex} is not the last color")
+                # logSS.debug(f"Index {cIndex} is not the last color")
 
                 # Check if the next color matches the current  pixel
                 if colorWithinTolerance(color=pxColor, target=colors[cIndex + 1].color, tolerance=colors[cIndex + 1].tolerance):
-                    logSS.debug(f"Pixel {px} color: {pxColor} matches next color: {colors[cIndex+1]}")
+                    # logSS.debug(f"Pixel {px} color: {pxColor} matches next color: {colors[cIndex+1]}")
 
                     # If so, increment to the next color and set
                     # the start pixel
@@ -137,11 +143,11 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
                 
                 # If the next color doesn't match the current pixel...
                 else:
-                    logSS.debug(f"Pixel {px} color: {pxColor} doesn't match next color: {colors[cIndex+1]}")
+                    # logSS.debug(f"Pixel {px} color: {pxColor} doesn't match next color: {colors[cIndex+1]}")
 
                     # Check if this is a "pure" required color
                     if colors[cIndex].pure == ColorPure.required:
-                        logSS.debug(f"Currently considered color {colors[cIndex]} is pure, must reset sequence")
+                        # logSS.debug(f"Currently considered color {colors[cIndex]} is pure, must reset sequence")
 
                         # If so, reset the entire sequence
                         colors = clearColorScanPixels(colors)
