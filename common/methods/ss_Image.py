@@ -22,15 +22,12 @@ def flexCropImage(im : Image, left, top, right, bottom, horizontalCount : int = 
         returnWidth = int((right - left + 1) / horizontalCount)
         returnHeight = int((bottom - top + 1) / verticalCount)
 
-        print(f"returnWidth: {returnWidth}, returnHeight: {returnHeight}")
-
         returnImageList = []
         for hPiece in range(horizontalCount):
             for vPiece in range(verticalCount):
                 pieceLeft = left + hPiece * returnWidth
                 pieceTop = top + vPiece * returnHeight
                 returnImageList.append(im.crop((pieceLeft, pieceTop, pieceLeft + returnWidth, pieceTop + returnHeight)))
-                returnImageList[-1].save(str(hPiece) + ".png")
         return returnImageList
 
 def mergeImages_Vertical(*images : ImageClass | list[ImageClass]) -> Image:
@@ -38,7 +35,6 @@ def mergeImages_Vertical(*images : ImageClass | list[ImageClass]) -> Image:
     # compile list of images
     imageList : list[ImageClass] = []
     for arg in images:
-        print(f"arg: {arg}")
         if isinstance(arg, list):
             for im in arg:
                 if isinstance(im, list):
@@ -48,8 +44,6 @@ def mergeImages_Vertical(*images : ImageClass | list[ImageClass]) -> Image:
                     imageList.append(im)
         else:
             imageList.append(arg)
-    
-    print(imageList)
 
     # find total image height
     totalHeight = 0
