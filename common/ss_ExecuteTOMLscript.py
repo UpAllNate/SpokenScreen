@@ -1,20 +1,36 @@
 from typing import Any
+
 try:
     from common.methods.ss_Pixel import *
 except:
     from methods.ss_Pixel import *
+
 try:
     from common.methods.ss_Arithmetic import *
 except:
     from methods.ss_Arithmetic import *
+
 try:
     from common.methods.ss_Hashing import *
 except:
     from methods.ss_Hashing import *
+
 try:
     from common.methods.ss_Image import *
 except:
     from methods.ss_Image import *
+
+try:
+    from common.ss_PathClasses import SSPath
+except:
+    from ss_PathClasses import SSPath
+
+try:
+    from common.ss_ColorClasses import ColorScanInstance, ColorPure
+except:
+    from ss_ColorClasses import ColorScanInstance, ColorPure
+
+import tomli, tomli_w, copy
 
 """
 These methods enable the functionality of 
@@ -23,7 +39,10 @@ These methods enable the functionality of
 # Recursively dig through dictionary to retrieve value
 def getDVal(d : dict, listPath : list) -> Any:
     for key in listPath:
-        d = d[key]
+        try:
+            d = d[key]
+        except:
+            d = getattr(d, key)
     return d
 
 # Return sorted list of numeric keys (sequence step indexes)
@@ -49,7 +68,7 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
     if argType == "const":
         return argValue
     if argType == "colors":
-        return [run["colorInstances"][color] for color in argValue]
+        return [copy.deepcopy(run["colorInstances"][color]) for color in argValue]
     if argType == "color":
         return run["colorInstances"][argValue]
 
@@ -105,7 +124,7 @@ def seqEx_screenshot(step : dict, run : dict) -> None:
     step["result"] = screenshot()
 
 def seqEx_makeNPArray(step : dict, run : dict) -> None:
-    im = getArgVal(step, ["image"], run)
+    im = getArgVal(step, "image", run)
     step["result"] = makeNPArray(im)
 
 def seqEx_flexCropImage(step : dict, run : dict) -> None:
@@ -121,6 +140,11 @@ def seqEx_saveImage(step : dict, run : dict) -> None:
     args = ["image", "fileName"]
     [im, fileNombre] = [getArgVal(step, arg, run) for arg in args]    
     step["result"] = saveImage(im, fileNombre)
+
+def seqEx_pixelSequenceScan(step : dict, run : dict) -> None:
+    args = ["pixels", "colors"]
+    [pixels, colors] = [getArgVal(step, arg, run) for arg in args]
+    step["result"] = pixelSequenceScan(pixels, colors)
 
 """
 This dictionary is the link between the function text in a sequence step
@@ -139,8 +163,79 @@ seqEx = {
     "makeNPArray" : seqEx_makeNPArray,
     "flexCropImage" : seqEx_flexCropImage,
     "mergeImages_Vertical" : seqEx_mergeImages_Vertical,
-    "saveImage" : seqEx_saveImage
+    "saveImage" : seqEx_saveImage,
+    "screenshot" : seqEx_screenshot,
+    "pixelSequenceScan" : seqEx_pixelSequenceScan
 }
+
+def initRun(filename_Run) -> dict:
+    run : dict = tomli.load(open(filename_Run, 'rb'))
+
+    # create colorInstances dict
+    run["colorInstances"] = {}
+
+    # fill colorInstances with objects
+    colors : dict = run["colors"]
+    for key in colors.keys():
+        (r, g, b) = colors[key]["color"]["r"], colors[key]["color"]["g"], colors[key]["color"]["b"]
+        purity = ColorPure.required if colors[key]["pureReq"] == True else ColorPure.notRequired
+        tolerance = colors[key]["tolerance"]
+
+        run["colorInstances"][key] = ColorScanInstance((r,g,b), tolerance, purity)
+
+    sequenceKeys : list(str) = run["sequence"].keys()
+
+    # verify all sequences have a hashList
+    for key in sequenceKeys:
+        seq = run["sequence"][key]
+        seq["hashIDList"] = []
+        seq["hashObjectList"] = []
+
+    # Check if the seq association is a valid
+    # run["sequence"] key. If so, put the
+    # hash definition values into the seq
+    # runtime lists
+    #
+    # Entries in run["hash"] are:
+    # {ID : (seqStr, hash, line text, character)}
+    for hashIDNumber in run["hash"]:
+        sequenceKey : str = run["hash"][hashIDNumber][0]
+        hashObject = imagehash.hex_to_hash(run["hash"][hashIDNumber][1])
+        if sequenceKey in sequenceKeys:
+            run["sequence"][sequenceKey]["hashIDList"].append(hashIDNumber)
+            run["sequence"][sequenceKey]["hashObjectList"].append(hashObject)
+        else:
+            logSS.critical(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
+            raise ValueError(f"Invalid sequence key in hash table: {sequenceKey}. Revise run.toml.")
+
+    return run
+
+def updateRun(filename_Run, run : dict) -> None:
+
+    exportRun = copy.deepcopy(run)
+
+    sequenceKeys : list(str) = exportRun["sequence"].keys()
+
+    # get rid of the sequence local hash lists
+    for key in sequenceKeys:
+        seq = exportRun["sequence"][key]
+        try:
+            seq.pop("hashIDList")
+        except:
+            pass
+        try:
+            seq.pop("hashObjectList")
+        except:
+            pass
+    
+    # get rid of the ColorScanInstance objects in run
+    try:
+        exportRun.pop("colorInstances")
+    except:
+        pass
+
+    
+
 
 """
 This function will accept any sequence dictionary and execute it.
@@ -151,16 +246,16 @@ def executeTOMLsequence(seq : dict, run : dict) -> bool:
 
     stepIndexes = parseSeqStepIndexes(seq)
 
-    print(f"\nRunning sequence {seq['name']}\n\n")
-
-    for stepIndex in stepIndexes:
+    for i, stepIndex in enumerate(stepIndexes):
         step = seq[stepIndex]
 
+        funName = step["function"]
+        print(f"Step {stepIndex}: {funName}")
         seqEx[step["function"]](step, run)
 
-        continueVal = getArgVal(step["continue"])
+        continueVal = getArgVal(step, "continue", run)
 
-        if isinstance(continueVal,bool) and not continueVal:
+        if isinstance(continueVal, bool) and not continueVal:
             return False
     
     return True
