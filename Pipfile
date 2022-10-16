@@ -9,6 +9,7 @@ imagehash = "*"
 six = "*"
 tomli = "*"
 numpy = "*"
+tomli-w = "*"
 
 [dev-packages]
 
