@@ -65,7 +65,6 @@ def getPixelColumn_Percent(im : list[list[tuple[int,int,int,int]]], percent : fl
     if limitPercent_High is None: limitPercent_High = 1.0
 
     column = int(getPercentOfRange(0, numberOfColumns + 1, percent))
-    print(f"column: {column}")
     limitPixel_Low = int(getPercentOfRange(0, numberOfRows, limitPercent_Low))
     limitPixel_High = int(getPercentOfRange(0, numberOfRows, limitPercent_High))
 
