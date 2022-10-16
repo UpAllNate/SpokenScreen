@@ -1,44 +1,55 @@
 from fileinput import filename
 from PIL import Image, ImageGrab
-from PIL.Image import Image
+from PIL.Image import Image as ImageClass
 import numpy
 from numpy import ndarray
+from typing import Union
 
-def screenshot() -> Image:
+def screenshot() -> ImageClass:
     return ImageGrab.grab()
 
-def makeNPArray(im : Image) -> ndarray:
+def makeNPArray(im : ImageClass) -> ndarray:
     return numpy.array(im)
 
-def flexCropImage(im : Image, left, top, right, bottom, horizontalCount : int = None, verticalCount : int = None) -> Image | list(Image):
+def flexCropImage(im : Image, left, top, right, bottom, horizontalCount : int = None, verticalCount : int = None):
 
     if horizontalCount is None: horizontalCount = 1
     if verticalCount is None: verticalCount = 1
 
     if horizontalCount == 1 and verticalCount == 1:
-        return im.crop(left, top, right, bottom)
+        return im.crop((left, top, right, bottom))
     else:
-        returnWidth = int((right - left) / horizontalCount)
-        returnHeight = int((bottom - top) / verticalCount)
+        returnWidth = int((right - left + 1) / horizontalCount)
+        returnHeight = int((bottom - top + 1) / verticalCount)
+
+        print(f"returnWidth: {returnWidth}, returnHeight: {returnHeight}")
 
         returnImageList = []
         for hPiece in range(horizontalCount):
             for vPiece in range(verticalCount):
                 pieceLeft = left + hPiece * returnWidth
                 pieceTop = top + vPiece * returnHeight
-                returnImageList.append(im.crop(pieceLeft, pieceTop, returnWidth, returnHeight))
-
+                returnImageList.append(im.crop((pieceLeft, pieceTop, pieceLeft + returnWidth, pieceTop + returnHeight)))
+                returnImageList[-1].save(str(hPiece) + ".png")
         return returnImageList
 
-def mergeImages_Vertical(*images : Image | list[Image]) -> Image:
+def mergeImages_Vertical(*images : ImageClass | list[ImageClass]) -> Image:
 
     # compile list of images
-    imageList : list[Image] = []
+    imageList : list[ImageClass] = []
     for arg in images:
+        print(f"arg: {arg}")
         if isinstance(arg, list):
-            imageList.extend(arg)
+            for im in arg:
+                if isinstance(im, list):
+                    for i in im:
+                        imageList.append(i)
+                else:
+                    imageList.append(im)
         else:
             imageList.append(arg)
+    
+    print(imageList)
 
     # find total image height
     totalHeight = 0
@@ -51,7 +62,7 @@ def mergeImages_Vertical(*images : Image | list[Image]) -> Image:
     # paste images, top to bottom
     yOffset = 0
     for image in imageList:
-        image.paste(returnImage, (0, yOffset))
+        returnImage.paste(image, (0, yOffset))
         yOffset += image.height
 
     return returnImage
