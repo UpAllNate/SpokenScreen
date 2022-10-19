@@ -232,38 +232,10 @@ def seqEx_saveHash_IfNew(step : dict, run : dict) -> None:
 
 def seqEx_updateRun(step : dict, run : dict) -> None:
 
-    exportRun = copy.deepcopy(run)
+    with open(SSPath.runTOML.path, 'rb') as f:
+        exportRun = tomli.load(f)
 
-    sequenceKeys : list(str) = exportRun["sequence"].keys()
-
-    # get rid of the sequence local hash lists
-    for key in sequenceKeys:
-        seq = exportRun["sequence"][key]
-        try:
-            seq.pop("hashIDList")
-        except:
-            pass
-        try:
-            seq.pop("hashObjectList")
-        except:
-            pass
-        for k in seq:
-            step = seq[k]
-            try:
-                step.pop("result")
-            except:
-                pass
-            try:
-                step.pop("prevHash")
-            except:
-                pass
-
-    
-    # get rid of the ColorScanInstance objects in run
-    try:
-        exportRun.pop("colorInstances")
-    except:
-        pass
+    exportRun["hash"] = run["hash"]
 
     with open(SSPath.runTOML.path, 'wb') as f:
         tomli_w.dump(exportRun, f)
