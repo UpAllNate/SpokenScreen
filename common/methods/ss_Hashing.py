@@ -1,7 +1,8 @@
 from PIL.Image import Image as ImageClass
 from time import perf_counter
-from imagehash import ImageHash
+from imagehash import ImageHash, hex_to_hash
 from numpy import ndarray
+
 
 def dhash_ndArray(arr : ndarray) -> ImageHash:
     diff = arr[:, 1:] > arr[:, :-1]
