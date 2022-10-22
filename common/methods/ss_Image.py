@@ -8,7 +8,7 @@ from typing import Union
 def screenshot() -> ImageClass:
     return ImageGrab.grab()
 
-def makeNPArray(im : ImageClass) -> ndarray:
+def makeNDArray(im : ImageClass) -> ndarray:
     return numpy.array(im)
 
 def flexCropImage(im : Image, left, top, right, bottom, horizontalCount : int = None, verticalCount : int = None):
