@@ -15,6 +15,7 @@ from typing import Any
 import tomli
 import time
 from common.ss_ExecuteTOMLscript import executeTOMLsequence, initRun
+import requests
 
 SSPath.runTOML.path = os.path.join(SSPath.dir.path, "Profiles\\PokeFR\\run.toml")
 SSPath.runTOML.detect()
@@ -26,9 +27,22 @@ run = initRun(SSPath.runTOML.path)
 # ssArr = numpy.array(screenShot)
 # midCol = getPixelColumn_Percent(ssArr, 0.5)
 
-while True:
-    executeTOMLsequence(run["sequence"]["test"], run)
+api_location = "http://localhost:5000"
 
+username = input("log into upallnate server:\n\n>> ")
+password = input("\npassword:\n\n>> ")
+
+data_={
+        "authentication":{
+        "username": username,
+        "password": password
+    }
+}
+result=requests.get(api_location + "/login",json=data_)
+print(result.json())
+
+while True:
+    executeTOMLsequence(run["sequence"]["BlueTB"], run)
 
 exit()
 
