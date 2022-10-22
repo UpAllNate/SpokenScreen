@@ -1,4 +1,5 @@
 from PIL.Image import Image as ImageClass
+from time import perf_counter
 import imagehash
 
 def computeHash_DHash(im : ImageClass, size : int = None):
@@ -11,14 +12,14 @@ def computeHashFlatness(
                         hash : imagehash.ImageHash,
                         prevHash : imagehash.ImageHash,
                         diffTol : int, 
-                        countThresh : int, 
-                        currentCount : int
-                        ) -> tuple[bool, imagehash.ImageHash, int]:
+                        flat_duration : int, 
+                        start_seconds : float
+                        ) -> tuple[bool, imagehash.ImageHash, float]:
     
     # Initialize if there is no previous hash
     if prevHash is None:
         prevHash = hash
-        currentCount = 0
+        start_seconds = 0
         flat = False
         diff = 0
     else:
@@ -28,11 +29,11 @@ def computeHashFlatness(
         diff = hash - prevHash
 
         if diff <= diffTol:
-            currentCount += 1
+            start_seconds += 1
         else:
-            currentCount = 0
+            start_seconds = 0
 
-        flat = True if currentCount >= countThresh else False
+        flat = True if start_seconds >= flat_duration else False
 
-    print(f"count: {currentCount}, diff: {diff}, flat: {flat}")
-    return flat, hash, currentCount
+    print(f"count: {start_seconds}, diff: {diff}, flat: {flat}")
+    return flat, hash, start_seconds
