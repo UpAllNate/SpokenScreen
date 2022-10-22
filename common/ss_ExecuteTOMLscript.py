@@ -1,35 +1,11 @@
 from typing import Any
 
-try:
-    from common.methods.ss_Pixel import *
-except:
-    from methods.ss_Pixel import *
-
-try:
-    from common.methods.ss_Arithmetic import *
-except:
-    from methods.ss_Arithmetic import *
-
-try:
-    from common.methods.ss_Hashing import *
-except:
-    from methods.ss_Hashing import *
-
-try:
-    from common.methods.ss_Image import *
-except:
-    from methods.ss_Image import *
-
-try:
-    from common.ss_PathClasses import SSPath
-except:
-    from ss_PathClasses import SSPath
-
-try:
-    from common.ss_ColorClasses import ColorScanInstance, ColorPure
-except:
-    from ss_ColorClasses import ColorScanInstance, ColorPure
-
+from common.methods.ss_Pixel import *
+from common.methods.ss_Arithmetic import *
+from common.methods.ss_Hashing import *
+from common.methods.ss_Image import *
+from common.ss_PathClasses import SSPath
+from common.ss_ColorClasses import ColorScanInstance, ColorPure
 import tomli, tomli_w, copy
 
 """
@@ -109,7 +85,7 @@ def initRun(filename_Run) -> dict:
         hashCount += 1
 
         sequenceKey : str = run["hash"][hashIDNumber][0]
-        hashObject = imagehash.hex_to_hash(run["hash"][hashIDNumber][1])
+        hashObject = hex_to_hash(run["hash"][hashIDNumber][1])
 
         if sequenceKey in sequenceKeys:
             run["sequence"][sequenceKey]["hashIDList"].append(hashIDNumber)
@@ -173,9 +149,9 @@ def seqEx_computeHash_DHash(step : dict, run : dict) -> None:
 def seqEx_screenshot(step : dict, run : dict) -> None:
     step["result"] = screenshot()
 
-def seqEx_makeNPArray(step : dict, run : dict) -> None:
+def seqEx_makeNDArray(step : dict, run : dict) -> None:
     im = getArgVal(step, "image", run)
-    step["result"] = makeNPArray(im)
+    step["result"] = makeNDArray(im)
 
 def seqEx_flexCropImage(step : dict, run : dict) -> None:
     args = ["image", "left", "top", "right", "bottom", "horizontalCount", "verticalCount"]
@@ -207,7 +183,7 @@ def seqEx_saveHash_IfNew(step : dict, run : dict) -> None:
     args = ["hash", "seq", "seqStr", "differenceTolerance"]
     [hash, seqDict, seqStr, diffTol] = [getArgVal(step, arg, run) for arg in args]
 
-    seqHashObjectList : list[imagehash.ImageHash] = seqDict["hashObjectList"]
+    seqHashObjectList : list[ImageHash] = seqDict["hashObjectList"]
 
     for i, seqHash in enumerate(seqHashObjectList):
         if hash - seqHash <= diffTol:
@@ -256,7 +232,7 @@ seqEx = {
     "flexMultiply" : seqEx_flexMultiply,
     "flexDivide" : seqEx_flexDivide,
     "computeHash_DHash" : seqEx_computeHash_DHash,
-    "makeNPArray" : seqEx_makeNPArray,
+    "makeNPArray" : seqEx_makeNDArray,
     "flexCropImage" : seqEx_flexCropImage,
     "mergeImages_Vertical" : seqEx_mergeImages_Vertical,
     "saveImage" : seqEx_saveImage,
