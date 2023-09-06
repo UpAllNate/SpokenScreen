@@ -2,68 +2,90 @@ from typing import Any
 
 # Adds any number of arguments, in lists, or not
 def flexAdd(*args : Any) -> Any:
+
+   if len(args) == 1:
+      args = args[0]
+
    sum = None
    for arg in args:
+
+      print(f"value: {arg}")
       if isinstance(arg, list):
-         for a in arg:
-            if sum is not None:
-               sum += a
-            else:
-               sum = a
+         if sum is not None:
+            sum -= flexAdd(arg)
+         else:
+            sum = flexAdd(arg)
       else:
          if sum is not None:
-            sum += a
+            sum -= arg
          else:
-            sum = a
+            sum = arg
+
    return sum
 
 # Subtracts any number of arguments, in lists, or not
 def flexSubtract(*args : Any) -> Any:
+
+   if len(args) == 1:
+      args = args[0]
+
    diff = None
    for arg in args:
+
+      print(f"value: {arg}")
       if isinstance(arg, list):
-         for a in arg:
-            if diff is not None:
-               diff -= a
-            else:
-               diff = a
+         if diff is not None:
+            diff -= flexSubtract(arg)
+         else:
+            diff = flexSubtract(arg)
       else:
          if diff is not None:
-            diff -= a
+            diff -= arg
          else:
-            diff = a
+            diff = arg
+
    return diff
 
 # Multiplies any number of arguments, in lists, or not
 def flexMultiply(*args : Any) -> Any:
+
+   if len(args) == 1:
+      args = args[0]
+
    product = None
    for arg in args:
+
       if isinstance(arg, list):
-         for a in arg:
-            if product is not None:
-               product *= a
-            else:
-               product = a
+         if product is not None:
+            product *= flexMultiply(arg)
+         else:
+            product = flexMultiply(arg)
       else:
          if product is not None:
-            product *= a
+            product *= arg
          else:
-            product = a
+            product = arg
+
    return product
 
 # Divides any number of arguments, in lists, or not
 def flexDivide(*args : Any) -> Any:
+
+   if len(args) == 1:
+      args = args[0]
+
    quotient = None
    for arg in args:
+
       if isinstance(arg, list):
-         for a in arg:
-            if quotient is not None:
-               quotient /= a
-            else:
-               quotient = a
+         if quotient is not None:
+            quotient /= flexDivide(arg)
+         else:
+            quotient = flexDivide(arg)
       else:
          if quotient is not None:
-            quotient /= a
+            quotient /= arg
          else:
-            quotient = a
+            quotient = arg
+
    return quotient
