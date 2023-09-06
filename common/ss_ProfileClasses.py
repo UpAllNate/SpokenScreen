@@ -1,5 +1,5 @@
 
-import tomli
+import tomllib
 import os
 try:
     from common.ss_PathClasses import PathElement, SSPath, PathType
@@ -62,7 +62,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
         try:
             runPath = os.path.join(profilePath,'run.toml')
             with open(runPath, 'rb') as f:
-                a = tomli.load(f)
+                a = tomllib.load(f)
                 profileName = a["name"]
                 profileVersion = a["version"]
                 _ = a["sequence"]
@@ -75,7 +75,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
         except FileNotFoundError as e:
             logSS.warning(f"Invalid profile detected: {profilePath}, missing run file {e}")
             continue
-        except tomli.TOMLDecodeError as e:
+        except tomllib.TOMLDecodeError as e:
             logSS.warning(f"Invalid profile detected: {profilePath}, cannot decode run.tomli... corrupted file: {e}")
             continue
         except Exception as e:
@@ -95,7 +95,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
         # At this point, run.toml is presumed to be valid
 
         # Determine if this profile has the required Audio Packs directory
-        audioPath = PathElement(PathType.directory, os.path.join(profilePath, "Audio Packs"))
+        audioPath = PathElement(PathType.DIRECTORY, os.path.join(profilePath, "Audio Packs"))
         if not audioPath.detect():
             logSS.warning(f"Invalid profile detected: {profilePath}, does not have Audio Packs folder")
             continue
@@ -111,7 +111,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
             # Audio Pack Description
             filePathStr = os.path.join(packDir,'desc.toml')
             try:
-                desc = tomli.load(open(filePathStr, 'rb'))
+                desc = tomllib.load(open(filePathStr, 'rb'))
                 title = desc["title"]
                 authors = desc["authors"]
             except KeyError as e:
@@ -120,7 +120,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
             except FileNotFoundError as e:
                 logSS.warning(f"Invalid Audio Pack detected in: {profilePath}, pack: {packDir} missing desc file {e}")
                 continue
-            except tomli.TOMLDecodeError as e:
+            except tomllib.TOMLDecodeError as e:
                 logSS.warning(f"Invalid Audio Pack detected in: {profilePath}, pack: {packDir} has desc.toml that cannot be decoded")
                 continue
             except Exception as e:

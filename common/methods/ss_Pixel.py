@@ -4,9 +4,9 @@ except:
     from ss_Logging import logSS
 
 try:
-    from common.ss_ColorClasses import ColorScanInstance, ColorPure
+    from common.ss_ColorClasses import Color, ColorRequirement
 except:
-    from ss_ColorClasses import ColorScanInstance, ColorPure
+    from ss_ColorClasses import Color, ColorRequirement
 
 try:
     from common.ss_ColorMethods import clearColorScanPixels, colorWithinTolerance
@@ -17,25 +17,25 @@ from PIL.Image import Image as ImageClass
 import numpy
 import copy
 
-def getPixelRow_Absolute(im : numpy.ndarray, row : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> numpy.ndarray:
-    numberOfRows = len(im)
-    numberOfColumns = len(im[0])
+def get_pixel_row_absolute(im : numpy.ndarray, row : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> numpy.ndarray:
+    row_count = len(im)
+    column_count = len(im[0])
 
     if limitPixel_Low is None: limitPixel_Low = 0
-    if limitPixel_High is None: limitPixel_High = numberOfColumns + 1
+    if limitPixel_High is None: limitPixel_High = column_count + 1
 
     return im[row][limitPixel_Low:limitPixel_High]
 
-def getPixelColumn_Absolute(im : list[list[tuple[int,int,int,int]]], column : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> list[list[int,int,int]]:
-    numberOfRows = len(im)
-    numberOfColumns = len(im[0])
+def get_pixel_column_absolute(im : list[list[tuple[int,int,int,int]]], column : int, limitPixel_Low : int = None, limitPixel_High : int = None) -> list[list[int,int,int]]:
+    row_count = len(im)
+    column_count = len(im[0])
 
     if limitPixel_Low is None: limitPixel_Low = 0
-    if limitPixel_High is None: limitPixel_High = numberOfRows + 1
+    if limitPixel_High is None: limitPixel_High = row_count + 1
 
     return [row[column][:3] for row in im[limitPixel_Low:limitPixel_High]]
 
-def getPercentOfRange(low, high, percent : float):
+def get_percent_of_range(low, high, percent : float):
     len = high - low
     if percent <= 0.0:
         return low
@@ -44,42 +44,54 @@ def getPercentOfRange(low, high, percent : float):
     else:
         return percent * len + low
 
-def getPixelRow_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, limitPercent_Low : float = None, limitPercent_High : float = None) -> list[list[int,int,int]]:
+def get_pixel_row_percent(
+    im : list[list[tuple[int,int,int,int]]],
+    percent : float,
+    limitPercent_Low : float = None,
+    limitPercent_High : float = None
+) -> list[list[int,int,int]]:
+    
     numberOfRows = len(im)
     numberOfColumns = len(im[0])
 
     if limitPercent_Low is None: limitPercent_Low = 0.0
     if limitPercent_High is None: limitPercent_High = 1.0
 
-    row = int(getPercentOfRange(0, numberOfRows, percent))
-    limitPixel_Low = int(getPercentOfRange(0, numberOfColumns, limitPercent_Low))
-    limitPixel_High = int(getPercentOfRange(0, numberOfColumns, limitPercent_High))
+    row = int(get_percent_of_range(0, numberOfRows, percent))
+    limitPixel_Low = int(get_percent_of_range(0, numberOfColumns, limitPercent_Low))
+    limitPixel_High = int(get_percent_of_range(0, numberOfColumns, limitPercent_High))
 
     return im[row][limitPixel_Low:limitPixel_High]
 
-def getPixelColumn_Percent(im : list[list[tuple[int,int,int,int]]], percent : float, limitPercent_Low : float = None, limitPercent_High : float = None) -> list[list[int,int,int]]:
+def get_pixel_column_percent(
+    im : list[list[tuple[int,int,int,int]]],
+    percent : float,
+    limitPercent_Low : float = None,
+    limitPercent_High : float = None
+) -> list[list[int,int,int]]:
+    
     numberOfRows = len(im)
     numberOfColumns = len(im[0])
 
     if limitPercent_Low is None: limitPercent_Low = 0.0
     if limitPercent_High is None: limitPercent_High = 1.0
 
-    column = int(getPercentOfRange(0, numberOfColumns + 1, percent))
-    limitPixel_Low = int(getPercentOfRange(0, numberOfRows, limitPercent_Low))
-    limitPixel_High = int(getPercentOfRange(0, numberOfRows, limitPercent_High))
+    column = int(get_percent_of_range(0, numberOfColumns + 1, percent))
+    limitPixel_Low = int(get_percent_of_range(0, numberOfRows, limitPercent_Low))
+    limitPixel_High = int(get_percent_of_range(0, numberOfRows, limitPercent_High))
 
     return [row[column] for row in im[limitPixel_Low:limitPixel_High]]
 
 # Returns detection result as bool and ColorScanInstance
 # of single instance or equal list length
-def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
-     colors : list[ColorScanInstance] | ColorScanInstance)\
-            -> tuple[bool, list[ColorScanInstance] | ColorScanInstance]:
+def pixel_sequence_scan(pixels : list[tuple[int,int,int]],\
+     colors : list[Color] | Color)\
+            -> tuple[bool, list[Color] | Color]:
 
     ####################################################
     #               Error Handling
     ####################################################
-    if isinstance(colors,ColorScanInstance):
+    if isinstance(colors,Color):
         _ = []
         _.append(colors)
         colors = _
@@ -87,7 +99,7 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
     else:
         singleColorInstance = False
 
-    if not isinstance(colors[0],ColorScanInstance):
+    if not isinstance(colors[0],Color):
         # logSS.critical(f"pixelSequenceScan received colors input of invalid type: {colors[0].__class__.__name__}")
         raise TypeError(f"pixelSequenceScan received colors input of invalid type: {colors[0].__class__.__name__}")
 
@@ -145,7 +157,7 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
                     # logSS.debug(f"Pixel {px} color: {pxColor} doesn't match next color: {colors[cIndex+1]}")
 
                     # Check if this is a "pure" required color
-                    if colors[cIndex].pure == ColorPure.required:
+                    if colors[cIndex].requirement == ColorRequirement.required:
                         # logSS.debug(f"Currently considered color {colors[cIndex]} is pure, must reset sequence")
 
                         # If so, reset the entire sequence
@@ -158,7 +170,7 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
             # If this is the last color in the sequence, end if it's
             # a pure required color
             else:
-                if colors[cIndex].pure == ColorPure.required:
+                if colors[cIndex].requirement == ColorRequirement.required:
                     if singleColorInstance:
                         return True, colors[0]
                     else:
@@ -167,7 +179,7 @@ def pixelSequenceScan(pixels : list[tuple[int,int,int]],\
     # If the entire pixel set is scanned and the sequence
     # is not completed, return false
 
-    if colors[-1].pure == ColorPure.notRequired and colors[-1].endPixel is not None:
+    if colors[-1].requirement == ColorRequirement.notRequired and colors[-1].endPixel is not None:
         if singleColorInstance:
             return True, colors[0]
         else:

@@ -9,15 +9,15 @@ except:
     from ss_Logging import logSS
 
 class PathType(Enum):
-    directory = enumAuto()
-    file = enumAuto()
+    DIRECTORY = enumAuto()
+    FILE = enumAuto()
 
 class PathElement:
     def detect(self) -> bool:
         # Error check presence of directory / file
         if self.path is not None:
             p = Path(self.path)
-            if self.type == PathType.directory:
+            if self.type == PathType.DIRECTORY:
                 if not p.is_dir():
                     self.present = False
                     if self.required:
@@ -28,7 +28,7 @@ class PathElement:
                 else:
                     self.present = True
                 
-            elif self.type == PathType.file:
+            elif self.type == PathType.FILE:
                 if not p.is_file():
                     self.present = False
                     if self.required:
@@ -74,47 +74,47 @@ class SSPath:
     # Directories
     dir = PathElement(
         p= rootDir,
-        type= PathType.directory
+        type= PathType.DIRECTORY
         )
     common = PathElement(
         p= os.path.join(dir.path,'common'),
-        type= PathType.directory
+        type= PathType.DIRECTORY
         )
     screenshot = PathElement(
         p= os.path.join(common.path, 'screenshot'),
-        type= PathType.directory
+        type= PathType.DIRECTORY
         )
     detection = PathElement(
         p= os.path.join(screenshot.path, 'detection'),
-        type= PathType.directory
+        type= PathType.DIRECTORY
         )
     logShots = PathElement(
         p= os.path.join(screenshot.path,'logShots'),
-        type= PathType.directory
+        type= PathType.DIRECTORY
         )
     profiles = PathElement(
         p= os.path.join(dir.path,'Profiles'),
-        type= PathType.directory
+        type= PathType.DIRECTORY
     )
 
     # Files
     file_logConfig = PathElement(
         p= os.path.join(common.path,'logging.conf'),
-        type= PathType.file
+        type= PathType.FILE
         )
 
     # Built on script startup
     selectedProfile = PathElement(
         p= None,
-        type= PathType.directory
+        type= PathType.DIRECTORY
     )
 
     selectedAudioPack = PathElement(
         p= None,
-        type= PathType.directory
+        type= PathType.DIRECTORY
     )
 
     runTOML = PathElement(
         p= None,
-        type= PathType.file
+        type= PathType.FILE
     )

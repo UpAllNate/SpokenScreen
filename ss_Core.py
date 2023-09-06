@@ -12,7 +12,7 @@ from common.ss_ColorClasses import *
 from common.methods.ss_Pixel import *
 from common.ss_ProfileClasses import findAllProfiles, AudioPackData, ProfileInstance
 from typing import Any
-import tomli
+import tomllib
 import time
 from common.ss_ExecuteTOMLscript import executeTOMLsequence, initRun
 import requests

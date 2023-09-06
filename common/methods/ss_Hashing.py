@@ -1,23 +1,19 @@
-from PIL.Image import Image as ImageClass
 from time import perf_counter
-from imagehash import ImageHash, hex_to_hash
+from imagehash import ImageHash
 from numpy import ndarray
 
 
-def dhash_ndArray(arr : ndarray) -> ImageHash:
+def dhash_nd_array(arr : ndarray) -> ImageHash:
     diff = arr[:, 1:] > arr[:, :-1]
     return ImageHash(diff)
 
-def computeHash_DHash(im_ndarray : ndarray):
-    return dhash_ndArray(im_ndarray)
-
-def computeHashFlatness(
-                        hash : ImageHash,
-                        prevHash : ImageHash,
-                        diffTol : int, 
-                        flat_duration : int, 
-                        start_seconds : float
-                        ) -> tuple[bool, ImageHash, float]:
+def compute_hash_flatness(
+    hash : ImageHash,
+    prevHash : ImageHash,
+    diffTol : int, 
+    flat_duration : int, 
+    start_seconds : float
+) -> tuple[bool, ImageHash, float]:
     
     # Initialize if there is no previous hash
     if prevHash is None:

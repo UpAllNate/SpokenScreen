@@ -1,12 +1,12 @@
 try:
-    from common.ss_ColorClasses import ColorScanInstance, ColorPure
+    from common.ss_ColorClasses import Color, ColorRequirement
 except:
-    from ss_ColorClasses import ColorScanInstance, ColorPure
+    from ss_ColorClasses import Color, ColorRequirement
 
-def clearColorScanPixels(colors : list[ColorScanInstance] | ColorScanInstance) -> list[ColorScanInstance] | ColorScanInstance:
+def clearColorScanPixels(colors : list[Color] | Color) -> list[Color] | Color:
     
     # Initialize all pixel return values
-    if isinstance(colors, ColorScanInstance):
+    if isinstance(colors, Color):
         colors.startPixel = None
         colors.endPixel = None
     else:

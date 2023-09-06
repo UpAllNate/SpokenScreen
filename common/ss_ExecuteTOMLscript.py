@@ -5,8 +5,8 @@ from common.methods.ss_Arithmetic import *
 from common.methods.ss_Hashing import *
 from common.methods.ss_Image import *
 from common.ss_PathClasses import SSPath
-from common.ss_ColorClasses import ColorScanInstance, ColorPure
-import tomli, tomli_w, copy
+from common.ss_ColorClasses import Color, ColorRequirement
+import tomllib, tomli_w, copy
 
 """
 These methods enable the functionality of 
@@ -51,7 +51,7 @@ def getArgVal(step : dict, arg : str, run : dict) -> Any:
 def initRun(filename_Run) -> dict:
     
     with open(filename_Run, 'rb') as f:
-        run : dict = tomli.load(f)
+        run : dict = tomllib.load(f)
 
     # create colorInstances dict
     run["colorInstances"] = {}
@@ -60,10 +60,10 @@ def initRun(filename_Run) -> dict:
     colors : dict = run["colors"]
     for key in colors.keys():
         (r, g, b) = colors[key]["color"]["r"], colors[key]["color"]["g"], colors[key]["color"]["b"]
-        purity = ColorPure.required if colors[key]["pureReq"] == True else ColorPure.notRequired
+        purity = ColorRequirement.required if colors[key]["pureReq"] == True else ColorRequirement.notRequired
         tolerance = colors[key]["tolerance"]
 
-        run["colorInstances"][key] = ColorScanInstance((r,g,b), tolerance, purity)
+        run["colorInstances"][key] = Color((r,g,b), tolerance, purity)
 
     sequenceKeys : list(str) = run["sequence"].keys()
 
@@ -104,22 +104,22 @@ These methods wrap the base python methods in a TOMLscript interpreter
 def seqEx_getPixelRow_Absolute(step : dict, run : dict) -> None:
     args = ["image", "row", "lowLimit", "highLimit"]
     [im, row, lowLimit, highLimit] = [getArgVal(step, arg, run) for arg in args]    
-    step["result"] = getPixelRow_Absolute(im, row, lowLimit, highLimit)
+    step["result"] = get_pixel_row_absolute(im, row, lowLimit, highLimit)
 
 def seqEx_getPixelColumn_Absolute(step : dict, run : dict) -> None:
     args = ["image", "column", "lowLimit", "highLimit"]
     [im, column, lowLimit, highLimit] = [getArgVal(step, arg, run) for arg in args]    
-    step["result"] = getPixelColumn_Absolute(im, column, lowLimit, highLimit)
+    step["result"] = get_pixel_column_absolute(im, column, lowLimit, highLimit)
 
 def seqEx_getPixelRow_Percent(step : dict, run : dict) -> None:
     args = ["image", "percent", "lowPercent", "highPercent"]
     [im, percent, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
-    step["result"] = getPixelRow_Percent(im, percent, lowPercent, highPercent)
+    step["result"] = get_pixel_row_percent(im, percent, lowPercent, highPercent)
 
 def seqEx_getPixelColumn_Percent(step : dict, run : dict) -> None:
     args = ["image", "percent", "lowPercent", "highPercent"]
     [im, percent, lowPercent, highPercent] = [getArgVal(step, arg, run) for arg in args]    
-    step["result"] = getPixelColumn_Percent(im, percent, lowPercent, highPercent)
+    step["result"] = get_pixel_column_percent(im, percent, lowPercent, highPercent)
 
 def seqEx_flexAdd(step : dict, run : dict) -> None:
    inputs = [getArgVal(step, arg, run) for arg in step.keys() if arg[:5] == "input"]
@@ -144,7 +144,7 @@ def seqEx_flexDivide(step : dict, run : dict) -> None:
 def seqEx_computeHash_DHash(step : dict, run : dict) -> None:
     args = ["image", "size"]
     [im, size] = [getArgVal(step, arg, run) for arg in args]    
-    step["result"] = computeHash_DHash(im, size)
+    step["result"] = compute_hash_dhash(im, size)
 
 def seqEx_screenshot(step : dict, run : dict) -> None:
     step["result"] = screenshot()
@@ -170,12 +170,12 @@ def seqEx_saveImage(step : dict, run : dict) -> None:
 def seqEx_pixelSequenceScan(step : dict, run : dict) -> None:
     args = ["pixels", "colors"]
     [pixels, colors] = [getArgVal(step, arg, run) for arg in args]
-    step["result"] = pixelSequenceScan(pixels, colors)
+    step["result"] = pixel_sequence_scan(pixels, colors)
 
 def seqEx_computHashFlatness(step : dict, run : dict) -> None:
     args = ["hash", "differenceTolerance", "flatCountThreshold", "prevHash", "currCount"]
     [hash, diffTol, countThresh, prevHash, currCount] = [getArgVal(step, arg, run) for arg in args]
-    step["result"], prevHash, currCount = computeHashFlatness(hash, prevHash, diffTol, countThresh, currCount)
+    step["result"], prevHash, currCount = compute_hash_flatness(hash, prevHash, diffTol, countThresh, currCount)
     step["prevHash"] = ["const", prevHash]
     step["currCount"] = ["const", currCount]
 
@@ -209,7 +209,7 @@ def seqEx_saveHash_IfNew(step : dict, run : dict) -> None:
 def seqEx_updateRun(step : dict, run : dict) -> None:
 
     with open(SSPath.runTOML.path, 'rb') as f:
-        exportRun = tomli.load(f)
+        exportRun = tomllib.load(f)
 
     exportRun["hash"] = run["hash"]
 
@@ -255,7 +255,7 @@ def executeTOMLsequence(seq : dict, run : dict) -> bool:
     for i, stepIndex in enumerate(stepIndexes):
         step = seq[stepIndex]
 
-        funName = step["function"]
+        # funName = step["function"]
         #print(f"Step {stepIndex}: {funName}")
         seqEx[step["function"]](step, run)
 

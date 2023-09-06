@@ -1,13 +1,13 @@
 from enum import Enum, auto as enumAuto
 
-class ColorPure(Enum):
+class ColorRequirement(Enum):
     required = enumAuto()
     notRequired = enumAuto()
 
-class ColorScanInstance:
-    def __init__(self, color : tuple[int,int,int], tolerance : int, pure : ColorPure) -> None:
+class Color:
+    def __init__(self, color : tuple[int,int,int], tolerance : int, requirement : ColorRequirement) -> None:
         self.color = color
-        self.pure = pure
+        self.requirement = requirement
         self.tolerance = tolerance
         self.startPixel = 0
         self.endPixel = 0
