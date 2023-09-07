@@ -1,5 +1,3 @@
-import os
-import sys
 from dataclasses import dataclass
 from enum import Enum, auto as enumAuto
 from pathlib import Path
@@ -13,57 +11,82 @@ class PathType(Enum):
     FILE = enumAuto()
 
 class PathElement:
+
     def detect(self) -> bool:
+
         # Error check presence of directory / file
-        if self.path is not None:
-            p = Path(self.path)
+        if self.path_str is not None:
+            
             if self.type == PathType.DIRECTORY:
-                if not p.is_dir():
+                if not self.path_obj.is_dir():
                     self.present = False
                     if self.required:
-                        logSS.error(f"Directory missing at {self.path}")
-                        raise ImportError(f"Required directory missing at: {self.path}")
+                        logSS.error(f"Directory missing at {self.path_str}")
+                        raise ImportError(f"Required directory missing at: {self.path_str}")
                     else:
-                        logSS.warning(f"Directory missing at {self.path}")
+                        logSS.warning(f"Directory missing at {self.path_str}")
                 else:
                     self.present = True
                 
             elif self.type == PathType.FILE:
-                if not p.is_file():
+                if not self.path_obj.is_file():
                     self.present = False
                     if self.required:
-                        logSS.error(f"Directory missing at {self.path}")
+                        logSS.error(f"Directory missing at {self.path_str}")
                         raise ImportError(f"Required file ")
                     else:
-                        logSS.warning(f"Directory missing at {self.path}")
+                        logSS.warning(f"Directory missing at {self.path_str}")
                 else:
                     self.present = True
-        
+
         return self.present
+    
+    def update_path_str(self, new_path_str : str) -> None:
+        self.path_str = new_path_str
+        self.path_obj = Path(new_path_str)
 
-    def __init__(self, type : PathType, p : str, req : bool = False):
-        self.path = p
-        logSS.debug(f"Path set: {p}")
-        self.present = False
-        self.type = type
-        self.required = req
-
-        # Error check PathType input
-        if self.type not in [i for i in PathType]:
-            logSS.critical(f"Incorrect path type defined: {self.type}")
-            raise ImportError(f"Incorrect path type defined: {self.type}")
+        print("path_str update: ",self.path_str, self.path_obj)
 
         self.detect()
+
+    def update_path_obj(self, new_path_obj : Path) -> None:
+        self.path_obj = new_path_obj
+        self.path_str = str(new_path_obj)
+
+        print("path_obj update: ",self.path_str, self.path_obj)
+
+        self.detect()
+
+    def __init__(self, type : PathType, path_obj : Path = None, path_str : str = None, req : bool = False):
+        
+        self.type = type
+
+        err = ""
+        # Error check PathType input
+        if self.type.__class__ is not PathType:
+            err = "Path type must be of PathType class"
+        elif self.type not in PathType:
+            err = "Path type enum is not in class definition"
+
+        if err != "":
+            err = f"Incorrect path type defined: {self.type}, err: {err}, path: {self.path_str}"
+            logSS.critical(err)
+            raise ImportError(err)
+        
+        self.required = req
+
+        # Set path string and Path object
+        if path_obj is not None:
+            self.update_path_obj(path_obj)
+        elif path_str is not None:
+            self.update_path_str(path_str)
+        else:
+            self.update_path_str("")
+
+        logSS.debug(f"Path set: {path_str}")
     
     def __str__(self) -> str:
-        return self.path
-
-# This logic finds the "true" root directory, depending
-# on whether this module is run from within the 
-# \common\ folder
-rootDir = os.path.dirname(os.path.realpath(sys.argv[0]))
-if rootDir[-7:] == "\\common":
-    rootDir = rootDir[:-7]
+        return f"PathElement object with path: {self.path_str}"
 
 """
 Get directory and file paths
@@ -72,49 +95,47 @@ Get directory and file paths
 class SSPath:
 
     # Directories
-    dir = PathElement(
-        p= rootDir,
+    root = PathElement(
+        path_obj= Path(__file__).parent.parent.resolve(),
         type= PathType.DIRECTORY
         )
     common = PathElement(
-        p= os.path.join(dir.path,'common'),
+        path_obj= Path.joinpath(root.path_obj,'common'),
         type= PathType.DIRECTORY
         )
     screenshot = PathElement(
-        p= os.path.join(common.path, 'screenshot'),
+        path_obj= Path.joinpath(common.path_obj, 'screenshot'),
         type= PathType.DIRECTORY
         )
     detection = PathElement(
-        p= os.path.join(screenshot.path, 'detection'),
+        path_obj= Path.joinpath(screenshot.path_obj, 'detection'),
         type= PathType.DIRECTORY
         )
     logShots = PathElement(
-        p= os.path.join(screenshot.path,'logShots'),
+        path_obj= Path.joinpath(screenshot.path_obj,'logShots'),
         type= PathType.DIRECTORY
         )
     profiles = PathElement(
-        p= os.path.join(dir.path,'Profiles'),
+        path_obj= Path.joinpath(root.path_obj,'Profiles'),
         type= PathType.DIRECTORY
     )
 
     # Files
     file_logConfig = PathElement(
-        p= os.path.join(common.path,'logging.conf'),
-        type= PathType.FILE
-        )
+        path_obj= Path.joinpath(common.path_obj,'logging.conf'),
+        type= PathType.FILE,
+        req= True
+    )
 
     # Built on script startup
     selectedProfile = PathElement(
-        p= None,
         type= PathType.DIRECTORY
     )
 
     selectedAudioPack = PathElement(
-        p= None,
         type= PathType.DIRECTORY
     )
 
     runTOML = PathElement(
-        p= None,
         type= PathType.FILE
     )

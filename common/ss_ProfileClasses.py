@@ -53,7 +53,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
     """
     Scan for all available profiles
     """
-    allProfilePaths = [ f.path for f in os.scandir(SSPath.profiles.path) if f.is_dir()]
+    allProfilePaths = [ f.path for f in os.scandir(SSPath.profiles.path_str) if f.is_dir()]
 
     validProfilePaths = []
     for profilePath in allProfilePaths:
@@ -103,7 +103,7 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
         allValidAudioPacks : list[AudioPackData] = []
 
         # Scan the AudioPack directory for all folders
-        audioPackPaths = [ a.path for a in os.scandir(audioPath.path) if a.is_dir()]
+        audioPackPaths = [ a.path for a in os.scandir(audioPath.path_str) if a.is_dir()]
 
         # Compile only those directories with an Audio Pack Description file that contains a title and hash table
         for packDir in audioPackPaths:
@@ -140,6 +140,6 @@ def findAllProfiles(reqSeq : bool, reqCol : bool, reqAud : bool) -> list[Profile
             logSS.warning(f"Invalid Profile detected in: {profilePath}, has no valid Audio Pack")
             continue
 
-        validProfilePaths.append(ProfileInstance(profileName, profileVersion, profilePath, audioPath.path, allValidAudioPacks))
+        validProfilePaths.append(ProfileInstance(profileName, profileVersion, profilePath, audioPath.path_str, allValidAudioPacks))
 
     return validProfilePaths

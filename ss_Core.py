@@ -17,10 +17,10 @@ import time
 from common.ss_ExecuteTOMLscript import executeTOMLsequence, initRun
 import requests
 
-SSPath.runTOML.path = os.path.join(SSPath.dir.path, "Profiles\\PokeFR\\run.toml")
+SSPath.runTOML.path_str = os.path.join(SSPath.root.path_str, "Profiles\\PokeFR\\run.toml")
 SSPath.runTOML.detect()
 
-run = initRun(SSPath.runTOML.path)
+run = initRun(SSPath.runTOML.path_str)
 
 # screenShot = ImageGrab.grab()
 # screenShot.save('ss.png')
@@ -84,13 +84,13 @@ if __name__ == "__main__":
 
     audioPack = profile.audioPacksList[chooseFromList("Please choose from the following audio packs:", profile.audioPacksList)]
 
-    SSPath.selectedProfile.path = profile.path
+    SSPath.selectedProfile.path_str = profile.path
     SSPath.selectedProfile.detect()
 
-    SSPath.selectedAudioPack.path = audioPack.path
+    SSPath.selectedAudioPack.path_str = audioPack.path
     SSPath.selectedAudioPack.detect()
 
-    SSPath.runTOML.path = os.path.join(SSPath.selectedProfile.path, "run.toml")
+    SSPath.runTOML.path_str = os.path.join(SSPath.selectedProfile.path_str, "run.toml")
     SSPath.runTOML.detect()
 
     

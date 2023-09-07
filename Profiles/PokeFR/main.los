@@ -3,8 +3,9 @@
 
 # Colors
 
-setup(
+@setup_start
 
+    @var_by_class
     blue_outer_v = Color(
         tolerance = 0,
         required = true,
@@ -13,38 +14,39 @@ setup(
         b = 160
     )
 
-    blue_inner_v = Color(
-        tolerance = 0,
-        required = true,
-        r = 160,
-        g = 208,
-        b = 224
-    )
-
-    blue_outer_h = Color(
-        tolerance = 0,
-        required = true,
-        r = 160,
-        g = 208,
-        b = 224
-    )
-
-    blue_inner_h = Color(
-        tolerance = 0,
-        required = true,
-        r = 208,
-        g = 224,
-        b = 240
-    )
-
-    blue_background = Color(
-        tolerance = 0,
-        required = false,
-        r = 248,
-        g = 248,
-        b = 248
-    )
+blue_inner_v = Color(
+    tolerance = 0,
+    required = true,
+    r = 160,
+    g = 208,
+    b = 224
 )
+
+blue_outer_h = Color(
+    tolerance = 0,
+    required = true,
+    r = 160,
+    g = 208,
+    b = 224
+)
+
+blue_inner_h = Color(
+    tolerance = 0,
+    required = true,
+    r = 208,
+    g = 224,
+    b = 240
+)
+
+blue_background = Color(
+    tolerance = 0,
+    required = false,
+    r = 248,
+    g = 248,
+    b = 248
+)
+
+@setup_end
 
 # Sequence
 

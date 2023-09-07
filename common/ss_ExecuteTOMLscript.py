@@ -208,12 +208,12 @@ def seqEx_saveHash_IfNew(step : dict, run : dict) -> None:
 
 def seqEx_updateRun(step : dict, run : dict) -> None:
 
-    with open(SSPath.runTOML.path, 'rb') as f:
+    with open(SSPath.runTOML.path_str, 'rb') as f:
         exportRun = tomllib.load(f)
 
     exportRun["hash"] = run["hash"]
 
-    with open(SSPath.runTOML.path, 'wb') as f:
+    with open(SSPath.runTOML.path_str, 'wb') as f:
         tomli_w.dump(exportRun, f)
     
     step["result"] = True

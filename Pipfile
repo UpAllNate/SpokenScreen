@@ -9,6 +9,7 @@ imagehash = "*"
 six = "*"
 numpy = "*"
 tomli-w = "*"
+ipykernel = "*"
 
 [dev-packages]
 ipykernel = "*"
