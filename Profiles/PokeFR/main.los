@@ -14,89 +14,119 @@
         b = 160
     )
 
-blue_inner_v = Color(
-    tolerance = 0,
-    required = true,
-    r = 160,
-    g = 208,
-    b = 224
-)
+    @var_by_class
+    blue_inner_v = Color(
+        tolerance = 0,
+        required = true,
+        r = 160,
+        g = 208,
+        b = 224
+    )
 
-blue_outer_h = Color(
-    tolerance = 0,
-    required = true,
-    r = 160,
-    g = 208,
-    b = 224
-)
+    @var_by_class
+    blue_outer_h = Color(
+        tolerance = 0,
+        required = true,
+        r = 160,
+        g = 208,
+        b = 224
+    )
 
-blue_inner_h = Color(
-    tolerance = 0,
-    required = true,
-    r = 208,
-    g = 224,
-    b = 240
-)
+    @var_by_class
+    blue_inner_h = Color(
+        tolerance = 0,
+        required = true,
+        r = 208,
+        g = 224,
+        b = 240
+    )
 
-blue_background = Color(
-    tolerance = 0,
-    required = false,
-    r = 248,
-    g = 248,
-    b = 248
-)
+    @var_by_class
+    blue_background = Color(
+        tolerance = 0,
+        required = false,
+        r = 248,
+        g = 248,
+        b = 248
+    )
 
 @setup_end
 
 # Sequence
 
+@function_call
 s = screenshot()
 
+@function_call
 s_np = make_np_array(s)
 
 # Get middle column of pixels of numpy array image
+@function_call
 pixel_column_middle = get_pixel_column_percent(
     image = s_np,
     percent = 0.5
 )
 
 # Scan for top, middle, and bottom of a blue textbox
-success, scan_colors_v = pixel_sequence_scan(
+@function_call
+scan_v_result = pixel_sequence_scan(
     pixels = pixel_column_middle,
     colors = [blue_outer_v, blue_inner_v, blue_background, blue_inner_v, blue_outer_v],
 )
 
+@getattr
+success = scan_v_result, 0
+
+@getattr
+scan_colors_v = scan_v_result, 1
+
 # If the blue dialogue top and bottom are not detected,
 # Stop running this sequence
-quit_if(!success)
+@quit_if !success
 
 # Get the row of pixels where the body of the dialogue box blue_background
 
 # access blue_background color object from the vertical scan
-_ = getattr(scan_colors_v, 2) 
+@getattr 
+_ = scan_colors_v, 2
 
 # access the top pixel row of the background color
-pixel_row_dialogue_top = getattr(_, start_pixel)
+@getattr
+pixel_row_dialogue_top = _, start_pixel
 
 # Scan horizontally to get left and right edges of dialogue box
-success, scan_colors_h = pixel_sequence_scan(
+scan_h_result = pixel_sequence_scan(
     pixels = pixel_row_dialogue_top,
     colors = [blue_outer_h, blue_inner_h, blue_background, blue_inner_h, blue_outer_h]
 )
 
-quit_if(!success)
+@getattr
+success = scan_h_result, 0
 
-_ = getattr(scan_colors_v, 2)
-box_top = getattr(_, start_pixel)
+@getattr
+scan_colors_h = scan_h_result, 1
 
-_ = getattr(scan_colors_v, 2)
-box_bottom = getattr(_, end_pixel)
+@quit_if (!success)
 
-_ = getattr(scan_colors_h, 2)
-box_left = getattr(_, start_pixel)
+@getattr
+_ = scan_colors_v, 2
+@getattr
+box_top = _, start_pixel
 
-_ = getattr(scan_colorsh, 2)
-box_right = getattr(_, end_pixel)
+@getattr
+_ = scan_colors_v, 2
+@getattr
+box_bottom = _, end_pixel
+
+@getattr
+_ = scan_colors_h, 2
+@getattr
+box_left = _, start_pixel
+
+@getattr
+_ = scan_colorsh, 2
+@getattr
+box_right = _, end_pixel
 
 
 
