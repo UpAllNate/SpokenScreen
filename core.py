@@ -3,6 +3,12 @@ from pathlib import Path
 from common.ss_PathClasses import PathElement, PathType, SSPath
 from common.ss_CoreClasses import FunReturn
 from common.ss_ProfileClasses import ProfileInstance
+from common.ss_ColorClasses import Color
+from common.ss_namespace_methods import NamespaceMethods
+
+namespace_operators = [
+    "(", ")", "[", "]", ",", ".", "=", "+", "-", "/", ":", ";"
+]
 
 class SpokenScreenApplication:
 
@@ -11,7 +17,7 @@ class SpokenScreenApplication:
         self.setup_complete = False
         self.los_dict = {}
 
-    def extract_program(self) -> tuple[bool,  str]:
+    def tokenize_program(self) -> tuple[bool,  str]:
 
         success, prog = False, ""
 
@@ -55,7 +61,7 @@ class SpokenScreenApplication:
 
         return success, prog
 
-    def execute_program(prog : str) -> None:
+    def parse_program(prog : list[str]) -> None:
         prog = prog.split(" ")
 
         scanning_setup = False
@@ -91,5 +97,5 @@ if __name__ == "__main__":
 
     app_blueTB = SpokenScreenApplication(mainLOS)
 
-    success, prog = app_blueTB.extract_program()
+    success, prog = app_blueTB.tokenize_program()
     print(prog)
