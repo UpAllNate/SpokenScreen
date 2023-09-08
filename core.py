@@ -1,28 +1,42 @@
 
 from pathlib import Path
 from common.ss_PathClasses import PathElement, PathType, SSPath
-from common.ss_CoreClasses import FunReturn
 from common.ss_ProfileClasses import ProfileInstance
 from common.ss_ColorClasses import Color
 from common.ss_namespace_methods import NamespaceMethods
+from enum import Enum, auto as enum_auto
 
 namespace_operators = [
-    "(", ")", "[", "]", ",", ".", "=", "+", "-", "/", ":", ";"
+    "(", ")", "[", "]", ",", ".", "=", "+", "-", "/", ":", ";", "!"
 ]
+
+namespace_forbidden = [
+    "from", "import"
+]
+
+class LOS_TokenTypes(Enum):
+    OPERATOR = enum_auto()
+    VARIABLE = enum_auto()
+    METHOD = enum_auto()
+
+class LOS_Token:
+    def __init__(self, string : str, type : LOS_TokenTypes) -> None:
+        self.string = string
+        self.type = type
 
 class SpokenScreenApplication:
 
     def __init__(self, file_los : PathElement ) -> None:
         self.file_los : PathElement = file_los
         self.setup_complete = False
-        self.los_dict = {}
+        self.namespace_variables = {}
 
-    def tokenize_program(self) -> tuple[bool,  str]:
+    def tokenize_program(self) -> tuple[bool,  list[LOS_Token]]:
 
-        success, prog = False, ""
+        success, prog_str = False, ""
 
         if not self.file_los.detect() or self.file_los.type is not PathType.FILE:
-            return success, prog
+            return success, prog_str
 
         with open(self.file_los.path_str, 'r') as los:
 
@@ -44,24 +58,49 @@ class SpokenScreenApplication:
 
                 # line += " @line_end "
 
-                if prog == "":
-                    prog = line
+                if prog_str == "":
+                    prog_str = line
                 else:
-                    prog += " " + line
+                    prog_str += " " + line
         
-        for c in ["[", "]", "(", ")", ","]:
-            prog = prog.replace(c, f" {c} ")
+        # Separate the operators and punctuation
+        for c in namespace_operators:
+            prog_str = prog_str.replace(c, f" {c} ")
 
-        while "  " in prog:
-            prog = prog.replace("  ", " ")
+        # Reduce all spaces to single space
+        while "  " in prog_str:
+            prog_str = prog_str.replace("  ", " ")
 
-        prog = prog.split(" ")
-            
+        # Split by spaces
+        tokens_str = prog_str.split(" ")
+        
+        # Generate token objects for each substring in the program
+        # And generate the application's variable namespace dictionary
+        program_tokens : list[LOS_Token] = []
+
+        for token_str in tokens_str:
+
+            if token_str in namespace_forbidden:
+                continue
+
+            elif token_str in namespace_operators:
+                program_tokens.append(LOS_Token(token_str, LOS_TokenTypes.OPERATOR))
+
+            elif token_str in NamespaceMethods.methods.keys():
+                program_tokens.append(LOS_Token(token_str, LOS_TokenTypes.METHOD))
+
+            else:
+                program_tokens.append(LOS_Token(token_str, LOS_TokenTypes.VARIABLE))
+
+                if token_str not in self.namespace_variables:
+                    self.namespace_variables[token_str] = None
+
         success = True
 
-        return success, prog
+        return success, program_tokens
 
-    def parse_program(prog : list[str]) -> None:
+
+    def parse_program(prog : list[LOS_Token]) -> None:
         prog = prog.split(" ")
 
         scanning_setup = False
