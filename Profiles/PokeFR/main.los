@@ -55,7 +55,6 @@ setup(
 
 s = screenshot()
 
-
 s_np = make_np_array(s)
 
 # Get middle column of pixels of numpy array image

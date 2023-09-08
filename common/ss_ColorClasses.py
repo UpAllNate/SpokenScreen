@@ -1,7 +1,7 @@
 from __future__ import annotations
 from enum import Enum, auto as enumAuto
 import colorsys
-from ss_namespace_methods import NamespaceMethods
+from common.ss_namespace_methods import NamespaceMethods
 
 class ColorRequirement(Enum):
     required = enumAuto()
