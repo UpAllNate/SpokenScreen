@@ -44,6 +44,7 @@ class LOS_TokenTypes(Enum):
 class LOS_ExpressionTypes(Enum):
     ASSIGNMENT = enum_auto()
     METHOD_CALL = enum_auto()
+    GETATTR = enum_auto()
 
 namespace_TokenType_Strings = {}
 namespace_TokenType_Strings["("] = LOS_TokenTypes.OPEN_PARENTHESES
@@ -58,7 +59,7 @@ namespace_TokenType_Strings[""" ' """] = LOS_TokenTypes.SINGLE_QUOTE
 namespace_TokenType_Strings["setup"] = LOS_TokenTypes.SETUP
 
 class LOS_Token:
-    def __init__(self, type : Union[LOS_TokenTypes, LOS_ExpressionTypes], string : str = None ) -> None:
+    def __init__(self, type : Union[LOS_TokenTypes, LOS_ExpressionTypes], string : str = None) -> None:
         self.string = string
         self.type = type
 
@@ -69,18 +70,18 @@ class LOS_Token:
             return f"Data class error, backup print content: {self.__dict__}"
 
 class LOS_ExpressionBase(LOS_Token):
-    def __init__(self, type: LOS_ExpressionTypes, string: str) -> None:
-        super().__init__(string= string, type= type)
-        self.start_token_num = None
+    def __init__(self, type: LOS_ExpressionTypes, start_token_num : int) -> None:
+        super().__init__(type= type)
+        self.start_token_num = start_token_num
         self.end_token_num = None
-        self.parsing = False
+        self.parsing = True
         self.resolved = False
         self.result = None
         self.tokens : list[LOS_Token] = []
 
 class LOS_Expression_Method(LOS_ExpressionBase):
-    def __init__(self, method : Callable, string: str) -> None:
-        super().__init__(string= string, type= LOS_ExpressionTypes.METHOD_CALL)
+    def __init__(self, method : Callable, start_token_num : int) -> None:
+        super().__init__(type= LOS_ExpressionTypes.METHOD_CALL, start_token_num= start_token_num)
         self.start_params_token_num = None
         self.start_params_bracket_level = None
         self.end_params_token_num = None
@@ -89,10 +90,16 @@ class LOS_Expression_Method(LOS_ExpressionBase):
         self.result = None
 
 class LOS_Expression_Assignment(LOS_ExpressionBase):
-    def __init__(self, string: str, source_token = None, destination_token = None) -> None:
-        super().__init__(string= string, type= LOS_ExpressionTypes.ASSIGNMENT)
-        self.source_token = source_token
+    def __init__(self, destination_token : LOS_Token, start_token_num : int) -> None:
+        super().__init__(type= LOS_ExpressionTypes.ASSIGNMENT, start_token_num= start_token_num)
+        self.source_token = None
         self.destination_token = destination_token
+
+class LOS_Expression_GetAttr(LOS_ExpressionBase):
+    def __init__(self, var : LOS_Token, start_token_num : int) -> None:
+        super().__init__(type= LOS_ExpressionTypes.GETATTR, start_token_num= start_token_num)
+        self.var = var
+        self.attr = None
 
 class SpokenScreenApplication:
 
@@ -199,7 +206,7 @@ class SpokenScreenApplication:
         parentheses_layer_count = 0
         square_bracket_layer_count = 0
         parsing_complete = False
-        
+
         while not parsing_complete:
             for t_num, token in enumerate(tokens):
 
@@ -229,12 +236,16 @@ class SpokenScreenApplication:
                         and tokens[t_num + 1].type == LOS_TokenTypes.ASSIGN:
 
                         new_expression = LOS_Expression_Assignment(
-                            string=token.string
+                            destination_token= token,
+                            start_token_num= t_num
                         )
 
-                        new_expression.start_token_num = t_num
-                        new_expression.destination_token = token
-                        new_expression.parsing = True
+                        expressions.append(new_expression)
+
+                    if token.type == LOS_TokenTypes.VARIABLE \
+                        and tokens[t_num + 1].type == LOS_TokenTypes.OPEN_BRACKET_SQUARE:
+
+                        new_expression = LOS_Expression_GetAttr(var= token, start_token_num= t_num)
 
                         expressions.append(new_expression)
 
@@ -242,11 +253,8 @@ class SpokenScreenApplication:
 
                     new_expression = LOS_Expression_Method(
                         method= NamespaceMethods.methods[token.string],
-                        string= token.string
+                        start_token_num= t_num
                     )
-
-                    new_expression.start_token_num = t_num
-                    new_expression.parsing = True
 
                     expressions.append(new_expression)
 
@@ -266,8 +274,8 @@ class SpokenScreenApplication:
                             LOS_TokenTypes.IMMEDIATE_INTEGER,
                             LOS_TokenTypes.VARIABLE,
                             LOS_ExpressionBase
-                        ] \
-                        or issubclass(exp.__class__, LOS_ExpressionBase):
+                        ]: # \
+                        #or issubclass(exp.__class__, LOS_ExpressionBase):
 
                             # Assignment is not resolved if this variable if there's a bracket getattr
                             if remaining_tokens > 2:
@@ -318,29 +326,44 @@ class SpokenScreenApplication:
                                 exp.resolved = True
                                 exp.parsing = False
 
-                            # Immediate value or variable tokens within
-                            if count_param_tokens > 0:
-
-                                for t in range(count_param_tokens):
-                                    res = False
-
-                                    # Resolved if only content is an immediate or variable
-                                    if tokens[t + exp.start_params_token_num].type in [
+                            # Immediate value or variable token within
+                            if count_param_tokens == 1:
+                                if tokens[t + exp.start_params_token_num].type in [
                                         LOS_TokenTypes.IMMEDIATE_FLOAT,
                                         LOS_TokenTypes.IMMEDIATE_INTEGER,
                                         LOS_TokenTypes.VARIABLE,
                                     ]:
-                                        res = True
 
-                                    # Resolved if 
-                                    if tokens[t + exp.start_params_token_num].type in [
-                                        LOS_TokenTypes.COMMA,
-                                        LOS_ExpressionTypes.ASSIGNMENT
-                                    ]:
-                                        res = True
+                                    exp.resolved = True
+                                    exp.parsing = False
 
-                                exp.resolved = res
-                                exp.parsing = False
+                            # resolved if internals are all variable, immediate value,
+                            # or expressions, separated by commas
+                            res = True
+                            req_comma = False
+                            for t in range(count_param_tokens):
+                                
+                                # If there's a comma requirement
+                                if req_comma:
+                                    if tokens[t + exp.start_params_token_num].type != LOS_TokenTypes.COMMA:
+                                        res = False
+                                
+                                # If this token has to be whatever's acceptable between commas
+                                elif not (
+                                    tokens[t + exp.start_params_token_num].type  in [
+                                        LOS_TokenTypes.IMMEDIATE_FLOAT,
+                                        LOS_TokenTypes.IMMEDIATE_INTEGER,
+                                        LOS_TokenTypes.VARIABLE,
+                                    ]
+                                    or issubclass(token.__class__, LOS_Expression_Assignment)
+                                    or issubclass(token.__class__, LOS_Expression_Assignment)
+                                ):
+                                    res = False
+
+                                req_comma = not req_comma
+
+                            exp.resolved = res
+                            exp.parsing = False
             parsing_complete = True
 
             new_tokens = copy.deepcopy(tokens)
