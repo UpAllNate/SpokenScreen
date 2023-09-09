@@ -69,17 +69,18 @@ class LOS_Token:
             return f"Data class error, backup print content: {self.__dict__}"
 
 class LOS_ExpressionBase(LOS_Token):
-    def __init__(self, type: LOS_ExpressionTypes, string: str = None) -> None:
-        super().__init__(string, type)
+    def __init__(self, type: LOS_ExpressionTypes, string: str) -> None:
+        super().__init__(string= string, type= type)
         self.start_token_num = None
         self.end_token_num = None
         self.parsing = False
         self.resolved = False
+        self.result = None
         self.tokens : list[LOS_Token] = []
 
 class LOS_Expression_Method(LOS_ExpressionBase):
-    def __init__(self, method : Callable, string: str = None) -> None:
-        super().__init__(string, LOS_ExpressionTypes.METHOD_CALL)
+    def __init__(self, method : Callable, string: str) -> None:
+        super().__init__(string= string, type= LOS_ExpressionTypes.METHOD_CALL)
         self.start_params_token_num = None
         self.start_params_bracket_level = None
         self.end_params_token_num = None
@@ -88,8 +89,8 @@ class LOS_Expression_Method(LOS_ExpressionBase):
         self.result = None
 
 class LOS_Expression_Assignment(LOS_ExpressionBase):
-    def __init__(self, source_token = None, destination_token = None, string: str = None) -> None:
-        super().__init__(string, LOS_ExpressionTypes.ASSIGNMENT)
+    def __init__(self, string: str, source_token = None, destination_token = None) -> None:
+        super().__init__(string= string, type= LOS_ExpressionTypes.ASSIGNMENT)
         self.source_token = source_token
         self.destination_token = destination_token
 
@@ -228,23 +229,20 @@ class SpokenScreenApplication:
                         and tokens[t_num + 1].type == LOS_TokenTypes.ASSIGN:
 
                         new_expression = LOS_Expression_Assignment(
-                            type=LOS_ExpressionTypes.ASSIGNMENT,
                             string=token.string
                         )
 
                         new_expression.start_token_num = t_num
                         new_expression.destination_token = token
                         new_expression.parsing = True
-                        new_expression.string = token.string
 
                         expressions.append(new_expression)
 
                 if token.type == LOS_TokenTypes.METHOD:
 
                     new_expression = LOS_Expression_Method(
-                        type=LOS_ExpressionTypes.METHOD_CALL,
                         method= NamespaceMethods.methods[token.string],
-                        string=token.string
+                        string= token.string
                     )
 
                     new_expression.start_token_num = t_num
@@ -378,4 +376,4 @@ if __name__ == "__main__":
     expressions = app_blueTB.parse_token_expressions(app_blueTB.tokens)
     print(f"There are {len(expressions)} expressions")
     for e in expressions:
-        print(f"{str(e) :{' '}<60}, resolved: {e.resolved}")
+        print(f"{str(e) :{' '}<90}, resolved: {e.resolved}")
