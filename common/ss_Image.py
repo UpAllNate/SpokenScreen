@@ -12,7 +12,7 @@ def screenshot() -> ImageClass:
     return ImageGrab.grab()
 
 @NamespaceMethods.register
-def makeNDArray(im : ImageClass) -> ndarray:
+def make_np_array(im : ImageClass) -> ndarray:
     return numpy.array(im)
 
 @NamespaceMethods.register

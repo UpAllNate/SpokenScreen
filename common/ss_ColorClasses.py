@@ -11,6 +11,7 @@ class ColorCompareMode(Enum):
     RGB = enumAuto()
     HSV = enumAuto()
 
+@NamespaceMethods.register
 class Color:
 
     def __init__(
